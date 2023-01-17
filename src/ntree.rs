@@ -5,14 +5,16 @@ use tpntree::{
     TpnTreeError,
 };
 
-pub struct NTree<const N: usize> {
+pub struct NTree<'a, const N: usize> {
     root: TpnTree<Vec<[f64; N]>, N>,
+    division_condition: &'a dyn Fn(&Self) -> bool,
 }
 
-impl<const N: usize> NTree<N> {
-    fn new() -> Self {
+impl<'a, const N: usize> NTree<'a, N> {
+    fn new(division_condition: &'a dyn Fn(&Self) -> bool) -> Self {
         NTree {
             root: SpatialTree::new([0.5; N], [0.5; N], 0),
+            division_condition,
         }
     }
 
@@ -29,12 +31,12 @@ mod test {
 
     #[test]
     fn create_tree() {
-        let _root: NTree<1> = NTree::new();
+        let _root: NTree<1> = NTree::new(&|_| false);
     }
 
     #[test]
     fn insert_1_d() {
-        let mut root: NTree<1> = NTree::new();
+        let mut root: NTree<1> = NTree::new(&|_| false);
         // insert inside span
         assert!(root.insert([0.2]).is_ok());
         assert!(root.insert([0.3]).is_ok());
@@ -47,7 +49,7 @@ mod test {
 
     #[test]
     fn insert_2_d() {
-        let mut root: NTree<2> = NTree::new();
+        let mut root: NTree<2> = NTree::new(&|_| false);
         // insert inside span
         assert!(root.insert([0.5, 0.5]).is_ok());
         assert!(root.insert([0.1, 0.8]).is_ok());
@@ -62,7 +64,7 @@ mod test {
 
     #[test]
     fn insert_4_d() {
-        let mut root: NTree<4> = NTree::new();
+        let mut root: NTree<4> = NTree::new(&|_| false);
         // insert inside span
         assert!(root.insert([0.0, 0.0, 0.0, 0.0]).is_ok());
         assert!(root.insert([1.0, 1.0, 1.0, 1.0]).is_ok());
