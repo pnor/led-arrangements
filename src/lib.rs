@@ -1,10 +1,11 @@
 #[cfg(feature = "visualizer")]
 extern crate kiss3d;
 
+mod math;
 mod ntree;
 
 pub fn add(left: usize, right: usize) -> usize {
-    left + right
+    return left + right;
 }
 
 #[cfg(test)]
