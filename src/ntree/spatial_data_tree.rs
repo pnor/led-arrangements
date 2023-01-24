@@ -11,13 +11,13 @@ pub struct DataPoint<T, const N: usize> {
     pub data: T,
 }
 
-pub fn spans<T, const N: usize>(tree: &SpatialDataTree<T, N>, datapoint: &DataPoint<T, N>) -> bool {
+pub fn spans<T, const N: usize>(tree: &SpatialDataTree<T, N>, point: &[f64; N]) -> bool {
     tree.coordinates()
         .iter()
         .enumerate()
         .all(|(dimension, &coordinate)| {
-            datapoint.point[dimension] <= coordinate + tree.span()[dimension]
-                && datapoint.point[dimension] >= coordinate - tree.span()[dimension]
+            point[dimension] <= coordinate + tree.span()[dimension]
+                && point[dimension] >= coordinate - tree.span()[dimension]
         })
 }
 
@@ -26,7 +26,7 @@ pub fn insert_by_coordinates<T, const N: usize>(
     datapoint: DataPoint<T, N>,
     division_condition: &dyn Fn(&SpatialDataTree<T, N>) -> bool,
 ) -> Result<(), TpnTreeError> {
-    if tree.is_root() && !spans(tree, &datapoint) {
+    if tree.is_root() && !spans(tree, &datapoint.point) {
         return Err(TpnTreeError::DoesNotSpan);
     }
 
@@ -58,15 +58,9 @@ fn insert_into_children<T, const N: usize>(
     datapoint: DataPoint<T, N>,
     division_condition: &dyn Fn(&SpatialDataTree<T, N>) -> bool,
 ) -> Result<(), TpnTreeError> {
-    // for child in tree.iter_children_mut() {
-    //     if spans(child, &datapoint) {
-    //         let res = insert_by_coordinates(child, datapoint , division_condition);
-    //     }
-    // }
-
     let res = tree
         .iter_children_mut()
-        .find(|child| spans(&child, &datapoint))
+        .find(|child| spans(&child, &datapoint.point))
         .map(|child| insert_by_coordinates(child, datapoint, division_condition))
         .unwrap();
     return res;
