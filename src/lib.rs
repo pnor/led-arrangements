@@ -1,6 +1,7 @@
 #[cfg(feature = "visualizer")]
 extern crate kiss3d;
 
+mod loc;
 mod math;
 mod ntree;
 
