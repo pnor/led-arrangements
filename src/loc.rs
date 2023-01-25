@@ -130,43 +130,42 @@ mod test {
         assert!(approx(&top.coords, &[0.5, 1.0]));
         let bottom = Loc::polar(0.5, &vec![(3.0 * PI) / 2.0], &[0.5, 0.5]);
         assert!(approx(&bottom.coords, &[0.5, 0.0]));
-        // let left = Loc::cartesian([0.0, 0.5]);
-        // assert_eq!(left.coords, [0.0, 0.5]);
-        // let right = Loc::cartesian([1.0, 0.5]);
-        // assert_eq!(right.coords, [1.0, 0.5]);
-        // let topleft = Loc::cartesian([-sqrt_2_over_2() + 0.5, sqrt_2_over_2() + 0.5]);
-        // assert_eq!(
-        //     topleft.coords,
-        //     [-sqrt_2_over_2() + 0.5, sqrt_2_over_2() + 0.5]
-        // );
+        let left = Loc::polar(0.5, &vec![PI], &[0.5, 0.5]);
+        assert!(approx(&left.coords, &[0.0, 0.5]));
+        let right = Loc::polar(0.5, &vec![0.0], &[0.5, 0.5]);
+        assert!(approx(&right.coords, &[1.0, 0.5]));
+        let topleft = Loc::polar(0.5, &vec![(3.0 * PI) / 4.0], &[0.5, 0.5]);
+        assert!(approx(
+            &topleft.coords,
+            &[
+                (-sqrt_2_over_2() / 2.0) + 0.5,
+                (sqrt_2_over_2() / 2.0) + 0.5
+            ]
+        ));
 
         // 3D
-        // let mid = Loc::cartesian([0.5, 0.5, 0.5]);
-        // assert_eq!(mid.coords, [0.5, 0.5, 0.5]);
-        // let mid_front = Loc::cartesian([0.5, 1.0, 0.5]);
-        // assert_eq!(mid_front.coords, [0.5, 1.0, 0.5]);
-        // let mid_back = Loc::cartesian([0.5, 0.0, 0.5]);
-        // assert_eq!(mid_back.coords, [0.5, 0.0, 0.5]);
-        // let top = Loc::cartesian([0.5, 0.5, 1.0]);
-        // assert_eq!(top.coords, [0.5, 0.5, 1.0]);
-        // let bottom = Loc::cartesian([0.5, 0.5, 0.0]);
-        // assert_eq!(bottom.coords, [0.5, 0.5, 0.0]);
-        // let left = Loc::cartesian([0.0, 0.5, 0.5]);
-        // assert_eq!(left.coords, [0.0, 0.5, 0.5]);
-        // let right = Loc::cartesian([1.0, 0.5, 0.5]);
-        // assert_eq!(right.coords, [1.0, 0.5, 0.5]);
-        // let topleftfront = Loc::cartesian([
-        //     -sqrt_2_over_2() + 0.5,
-        //     sqrt_2_over_2() + 0.5,
-        //     sqrt_2_over_2() + 0.5,
-        // ]);
-        // assert_eq!(
-        //     topleftfront.coords,
-        //     [
-        //         -sqrt_2_over_2() + 0.5,
-        //         sqrt_2_over_2() + 0.5,
-        //         sqrt_2_over_2() + 0.5
-        //     ]
-        // );
+        let mid = Loc::polar(0.0, &vec![0.0, 0.0], &[0.5, 0.5, 0.5]);
+        assert_eq!(mid.coords, [0.5, 0.5, 0.5]);
+        let mid_front = Loc::polar(0.5, &vec![PI / 2.0, 0.0], &[0.5, 0.5, 0.5]);
+        assert_eq!(mid_front.coords, [0.5, 1.0, 0.5]);
+        let mid_back = Loc::polar(0.5, &vec![-PI / 2.0, 0.0], &[0.5, 0.5, 0.5]);
+        assert_eq!(mid_back.coords, [0.5, 0.0, 0.5]);
+        let top = Loc::polar(0.5, &vec![PI / 2.0, PI / 2.0], &[0.5, 0.5, 0.5]);
+        assert_eq!(top.coords, [0.5, 0.5, 1.0]);
+        let bottom = Loc::polar(0.5, &vec![PI / 2.0, -PI / 2.0], &[0.5, 0.5, 0.5]);
+        assert_eq!(bottom.coords, [0.5, 0.5, 0.0]);
+        let left = Loc::polar(0.5, &vec![PI, PI / 2.0], &[0.5, 0.5, 0.5]);
+        assert!(approx(&left.coords, &[0.0, 0.5, 0.5]));
+        let right = Loc::polar(0.5, &vec![0.0, PI / 2.0], &[0.5, 0.5, 0.5]);
+        assert_eq!(right.coords, [1.0, 0.5, 0.5]);
+        let topleftfront = Loc::polar(
+            0.5,
+            &vec![(3.0 * PI) / 4.0, (3.0 * PI) / 4.0],
+            &[0.5, 0.5, 0.5],
+        );
+        assert!(approx(
+            &topleftfront.coords,
+            &[(-sqrt_2_over_2() / 2.0) + 0.5, 0.25, 0.75]
+        ));
     }
 }
