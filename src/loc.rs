@@ -6,10 +6,6 @@ pub struct Loc<const N: usize> {
 }
 
 impl<const N: usize> Loc<N> {
-    const fn one_less() -> usize {
-        N - 1
-    }
-
     pub fn cartesian(loc: [f64; N]) -> Self {
         Loc { coords: loc }
     }
@@ -167,5 +163,13 @@ mod test {
             &topleftfront.coords,
             &[(-sqrt_2_over_2() / 2.0) + 0.5, 0.25, 0.75]
         ));
+    }
+
+    #[test]
+    fn cylindrical_loc() {
+        // 3D
+        let bottom = Loc::polar(0.0, &vec![0.0, 0.0], &[0.5, 0.5, 0.5]);
+        assert_eq!(bottom.coords, [0.5, 0.5, 0.0]);
+        // TODO
     }
 }
