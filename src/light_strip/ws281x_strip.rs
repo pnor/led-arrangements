@@ -6,12 +6,12 @@ use crate::color::Color;
 
 const CHANNEL: usize = 0;
 
-struct Ws281xStrip {
+pub struct Ws281xStrip {
     controller: Controller,
 }
 
 impl Ws281xStrip {
-    fn new(config: LightConfig) -> Result<Self, WS2811Error> {
+    pub fn new(config: LightConfig) -> Result<Self, WS2811Error> {
         let controller = ControllerBuilder::new()
             .freq(800_000)
             .dma(10)
@@ -30,7 +30,7 @@ impl Ws281xStrip {
 
 impl LightStrip for Ws281xStrip {
     fn get(&self, index: usize) -> Color {
-        let raw = self.controller.leds(CHANNEL)[0];
+        let raw = self.controller.leds(CHANNEL)[index];
         return Color {
             red: raw[0],
             green: raw[1],

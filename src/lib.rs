@@ -1,6 +1,7 @@
 #[cfg(feature = "visualizer")]
 extern crate kiss3d;
 
+mod arrangement;
 mod color;
 mod light_strip;
 mod loc;
