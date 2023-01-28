@@ -7,11 +7,11 @@ use crate::color::Color;
 use self::ws281x_strip::Ws281xStrip;
 use rs_ws281x::WS2811Error;
 
-trait LightStrip {
-    pub fn get(&self, index: usize) -> Color;
-    pub fn set(&mut self, index: usize, color: Color);
-    pub fn show(&self);
-    pub fn fill(&mut self, color: Color);
+pub trait LightStrip {
+    fn get(&self, index: usize) -> Color;
+    fn set(&mut self, index: usize, color: Color);
+    fn show(&mut self);
+    fn fill(&mut self, color: Color);
 }
 
 impl dyn LightStrip {
@@ -24,7 +24,7 @@ impl dyn LightStrip {
     }
 }
 
-struct LightConfig {
+pub struct LightConfig {
     pub number_lights: i32,
     pub io_pin: i32,
 }

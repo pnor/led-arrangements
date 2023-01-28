@@ -42,20 +42,19 @@ impl LightStrip for Ws281xStrip {
         self.controller.leds_mut(CHANNEL)[index] = [color.red, color.green, color.blue, 0];
     }
 
-    fn show(&self) {
-        self.controller.render();
+    fn show(&mut self) {
+        let _ = self.controller.render();
     }
 
     fn fill(&mut self, color: Color) {
         self.controller
             .leds_mut(CHANNEL)
             .iter_mut()
-            .map(|raw| {
+            .for_each(|raw| {
                 raw[0] = color.red;
                 raw[1] = color.green;
                 raw[2] = color.blue;
                 raw[3] = 0;
-            })
-            .collect::<()>();
+            });
     }
 }

@@ -1,3 +1,5 @@
+use std::ptr::copy_nonoverlapping;
+
 /// Interface for talking about locations in coordinate space
 /// Converts cartesian, polar, and cylindrical into float arrays
 
@@ -33,8 +35,26 @@ impl<const N: usize> Loc<N> {
         return Loc { coords };
     }
 
-    pub fn cylindrical(radius: f64, theta: f64, coords: Vec<f64>) -> Self {
-        todo!()
+    /// Create a point using cylindrical coordinates
+    /// `radius` is distance from the center and `theta` is the angle in radians.
+    /// Dimensions after the first 2 are copied from `coords`.
+    /// Origin is the point the clindir is centered and based at.
+    pub fn cylindrical(radius: f64, theta: f64, coords: Vec<f64>, origin: &[f64; N]) -> Self {
+        let mut loc_coords: [f64; N] = *origin;
+        match N {
+            n if n >= 2 => {
+                loc_coords[0] = (theta.cos() * radius) + origin[0];
+                loc_coords[1] = (theta.sin() * radius) + origin[1];
+                for i in 2..N {
+                    loc_coords[i] = coords[i - 2] + origin[i];
+                }
+            }
+            1 => {
+                loc_coords[0] = (theta.cos() * radius) + origin[0];
+            }
+            _ => (),
+        };
+        return Loc { coords: loc_coords };
     }
 }
 
@@ -168,8 +188,22 @@ mod test {
     #[test]
     fn cylindrical_loc() {
         // 3D
-        let bottom = Loc::polar(0.0, &vec![0.0, 0.0], &[0.5, 0.5, 0.5]);
+        let bottom = Loc::cylindrical(0.0, 0.0, vec![0.0], &[0.5, 0.5, 0.0]);
         assert_eq!(bottom.coords, [0.5, 0.5, 0.0]);
-        // TODO
+        let bottom_front = Loc::cylindrical(0.5, PI / 2.0, vec![0.0], &[0.5, 0.5, 0.0]);
+        assert_eq!(bottom_front.coords, [0.5, 1.0, 0.0]);
+        let bottom_back = Loc::cylindrical(0.5, (3.0 * PI) / 2.0, vec![0.0], &[0.5, 0.5, 0.0]);
+        assert!(approx(&bottom_back.coords, &[0.5, 0.0, 0.0]));
+        let bottom_right = Loc::cylindrical(0.5, PI, vec![0.0], &[0.5, 0.5, 0.0]);
+        assert!(approx(&bottom_right.coords, &[0.0, 0.5, 0.0]));
+
+        let top = Loc::cylindrical(0.0, 0.0, vec![0.0], &[0.5, 0.5, 1.0]);
+        assert_eq!(top.coords, [0.5, 0.5, 1.0]);
+        let top_front = Loc::cylindrical(0.5, PI / 2.0, vec![0.0], &[0.5, 0.5, 1.0]);
+        assert_eq!(top_front.coords, [0.5, 1.0, 1.0]);
+        let top_back = Loc::cylindrical(0.5, (3.0 * PI) / 2.0, vec![0.0], &[0.5, 0.5, 1.0]);
+        assert!(approx(&top_back.coords, &[0.5, 0.0, 1.0]));
+        let top_right = Loc::cylindrical(0.5, PI, vec![0.0], &[0.5, 0.5, 1.0]);
+        assert!(approx(&top_right.coords, &[0.0, 0.5, 1.0]));
     }
 }
