@@ -1,3 +1,4 @@
+mod test_strip;
 /// Abstraction around the means to actually control the LED Strip. Establishes a common API across
 /// each strip type
 mod ws281x_strip;

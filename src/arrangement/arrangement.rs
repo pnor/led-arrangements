@@ -61,109 +61,152 @@ mod test {
 
     // TODO fix the test cases to use datapoint
 
-    // #[test]
-    // fn get_closest() {
-    //     let arr = Arrangement::new(&ArrangementConfig {
-    //         light_locations: vec![
-    //             ([0.1, 0.1, 0.1], 1),
-    //             ([0.9, 0.9, 0.9], 2),
-    //             ([0.5, 0.5, 0.5], 3),
-    //             ([0.1, 0.9, 0.1], 4),
-    //             ([0.1, 0.1, 0.9], 5),
-    //         ],
-    //     });
-    //     assert_eq!(
-    //         arr.get_closest(&Loc::cartesian([0.2, 0.2, 0.2]), 0.2),
-    //         Some(1)
-    //     );
-    //     assert_eq!(arr.get_closest(&Loc::cartesian([0.3, 0.3, 0.3]), 0.1), None);
-    //     assert_eq!(
-    //         arr.get_closest(&Loc::cartesian([0.45, 0.45, 0.45]), 0.1),
-    //         Some(3)
-    //     );
-    //     assert_eq!(
-    //         arr.get_closest(&Loc::cartesian([0.1, 0.9, 0.1]), 0.3),
-    //         Some(4)
-    //     );
-    //     assert_eq!(
-    //         arr.get_closest(&Loc::cartesian([0.2, 0.2, 0.8]), 0.3),
-    //         Some(5)
-    //     );
-    // }
+    #[test]
+    fn get_closest() {
+        let arr = Arrangement::new(&ArrangementConfig {
+            light_locations: vec![
+                ([0.1, 0.1, 0.1], 1),
+                ([0.9, 0.9, 0.9], 2),
+                ([0.5, 0.5, 0.5], 3),
+                ([0.1, 0.9, 0.1], 4),
+                ([0.1, 0.1, 0.9], 5),
+            ],
+        });
+        assert_eq!(
+            arr.get_closest(&Loc::cartesian([0.2, 0.2, 0.2]), 0.2)
+                .unwrap()
+                .data,
+            1
+        );
+        assert_eq!(
+            arr.get_closest(&Loc::cartesian([0.2, 0.2, 0.2]), 0.2)
+                .unwrap()
+                .point,
+            [0.1, 0.1, 0.1]
+        );
+        assert!(arr
+            .get_closest(&Loc::cartesian([0.3, 0.3, 0.3]), 0.1)
+            .is_none());
+        assert_eq!(
+            arr.get_closest(&Loc::cartesian([0.45, 0.45, 0.45]), 0.1)
+                .unwrap()
+                .data,
+            3
+        );
+        assert_eq!(
+            arr.get_closest(&Loc::cartesian([0.1, 0.9, 0.1]), 0.3)
+                .unwrap()
+                .data,
+            4
+        );
+        assert_eq!(
+            arr.get_closest(&Loc::cartesian([0.2, 0.2, 0.8]), 0.3)
+                .unwrap()
+                .data,
+            5
+        );
+    }
 
-    // #[test]
-    // fn get_radius() {
-    //     let arr = Arrangement::new(&ArrangementConfig {
-    //         light_locations: vec![
-    //             ([0.1, 0.1, 0.1], 1),
-    //             ([0.9, 0.9, 0.9], 2),
-    //             ([0.5, 0.5, 0.5], 3),
-    //             ([0.1, 0.9, 0.1], 4),
-    //             ([0.1, 0.1, 0.9], 5),
-    //             ([0.4, 0.4, 0.4], 6),
-    //         ],
-    //     });
-    //     assert_eq!(
-    //         arr.get_within_radius(&Loc::cartesian([0.2, 0.2, 0.2]), 0.2),
-    //         vec![1]
-    //     );
-    //     assert_eq!(
-    //         arr.get_within_radius(&Loc::cartesian([0.3, 0.3, 0.3]), 0.1),
-    //         vec![]
-    //     );
-    //     assert_eq!(
-    //         arr.get_within_radius(&Loc::cartesian([0.45, 0.45, 0.5]), 0.08),
-    //         vec![3]
-    //     );
-    //     assert_eq!(
-    //         arr.get_within_radius(&Loc::cartesian([0.5, 0.5, 0.5]), 0.5),
-    //         vec![3, 6]
-    //     );
-    //     assert_eq!(
-    //         arr.get_within_radius(&Loc::cartesian([0.5, 0.5, 0.5]), 0.9),
-    //         vec![1, 2, 3, 4, 5, 6]
-    //     );
-    // }
+    #[test]
+    fn get_radius() {
+        let arr = Arrangement::new(&ArrangementConfig {
+            light_locations: vec![
+                ([0.1, 0.1, 0.1], 1),
+                ([0.9, 0.9, 0.9], 2),
+                ([0.5, 0.5, 0.5], 3),
+                ([0.1, 0.9, 0.1], 4),
+                ([0.1, 0.1, 0.9], 5),
+                ([0.4, 0.4, 0.4], 6),
+            ],
+        });
+        assert_eq!(
+            arr.get_within_radius(&Loc::cartesian([0.2, 0.2, 0.2]), 0.2)
+                .iter()
+                .map(|pt| pt.data)
+                .collect::<Vec<usize>>(),
+            vec![1]
+        );
+        assert_eq!(
+            arr.get_within_radius(&Loc::cartesian([0.3, 0.3, 0.3]), 0.1)
+                .iter()
+                .map(|pt| pt.data)
+                .collect::<Vec<usize>>(),
+            vec![]
+        );
+        assert_eq!(
+            arr.get_within_radius(&Loc::cartesian([0.45, 0.45, 0.5]), 0.08)
+                .iter()
+                .map(|pt| pt.data)
+                .collect::<Vec<usize>>(),
+            vec![3]
+        );
+        assert_eq!(
+            arr.get_within_radius(&Loc::cartesian([0.5, 0.5, 0.5]), 0.5)
+                .iter()
+                .map(|pt| pt.data)
+                .collect::<Vec<usize>>(),
+            vec![3, 6]
+        );
+        assert_eq!(
+            arr.get_within_radius(&Loc::cartesian([0.5, 0.5, 0.5]), 0.9)
+                .iter()
+                .map(|pt| pt.data)
+                .collect::<Vec<usize>>(),
+            vec![1, 2, 3, 4, 5, 6]
+        );
+    }
 
-    // #[test]
-    // fn get_bounding_box() {
-    //     let arr = Arrangement::new(&ArrangementConfig {
-    //         light_locations: vec![
-    //             ([0.1, 0.1, 0.1], 1),
-    //             ([0.9, 0.9, 0.9], 2),
-    //             ([0.5, 0.5, 0.5], 3),
-    //             ([0.1, 0.9, 0.1], 4),
-    //             ([0.1, 0.1, 0.9], 5),
-    //             ([0.4, 0.4, 0.4], 6),
-    //         ],
-    //     });
-    //     assert_eq!(
-    //         arr.get_within_bounding_box(
-    //             &Loc::cartesian([0.0, 0.0, 0.0]),
-    //             &Loc::cartesian([0.3, 0.3, 0.3])
-    //         ),
-    //         vec![1]
-    //     );
-    //     assert_eq!(
-    //         arr.get_within_bounding_box(
-    //             &Loc::cartesian([0.8, 0.8, 0.0]),
-    //             &Loc::cartesian([1.0, 1.0, 1.0])
-    //         ),
-    //         vec![2]
-    //     );
-    //     assert_eq!(
-    //         arr.get_within_bounding_box(
-    //             &Loc::cartesian([0.2, 0.2, 0.2]),
-    //             &Loc::cartesian([0.3, 0.3, 0.3])
-    //         ),
-    //         vec![]
-    //     );
-    //     assert_eq!(
-    //         arr.get_within_bounding_box(
-    //             &Loc::cartesian([-0.1, -0.1, -0.1]),
-    //             &Loc::cartesian([1.1, 1.1, 1.1])
-    //         ),
-    //         vec![1, 2, 3, 4, 5, 6]
-    //     );
-    // }
+    #[test]
+    fn get_bounding_box() {
+        let arr = Arrangement::new(&ArrangementConfig {
+            light_locations: vec![
+                ([0.1, 0.1, 0.1], 1),
+                ([0.9, 0.9, 0.9], 2),
+                ([0.5, 0.5, 0.5], 3),
+                ([0.1, 0.9, 0.1], 4),
+                ([0.1, 0.1, 0.9], 5),
+                ([0.4, 0.4, 0.4], 6),
+            ],
+        });
+        assert_eq!(
+            arr.get_within_bounding_box(
+                &Loc::cartesian([0.0, 0.0, 0.0]),
+                &Loc::cartesian([0.3, 0.3, 0.3])
+            )
+            .iter()
+            .map(|pt| pt.data)
+            .collect::<Vec<usize>>(),
+            vec![1]
+        );
+        assert_eq!(
+            arr.get_within_bounding_box(
+                &Loc::cartesian([0.8, 0.8, 0.0]),
+                &Loc::cartesian([1.0, 1.0, 1.0])
+            )
+            .iter()
+            .map(|pt| pt.data)
+            .collect::<Vec<usize>>(),
+            vec![2]
+        );
+        assert_eq!(
+            arr.get_within_bounding_box(
+                &Loc::cartesian([0.2, 0.2, 0.2]),
+                &Loc::cartesian([0.3, 0.3, 0.3])
+            )
+            .iter()
+            .map(|pt| pt.data)
+            .collect::<Vec<usize>>(),
+            vec![]
+        );
+        assert_eq!(
+            arr.get_within_bounding_box(
+                &Loc::cartesian([-0.1, -0.1, -0.1]),
+                &Loc::cartesian([1.1, 1.1, 1.1])
+            )
+            .iter()
+            .map(|pt| pt.data)
+            .collect::<Vec<usize>>(),
+            vec![1, 2, 3, 4, 5, 6]
+        );
+    }
 }

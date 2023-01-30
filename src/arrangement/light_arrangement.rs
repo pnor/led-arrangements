@@ -43,11 +43,37 @@ impl<'a, T: LightStrip, const N: usize> LightArrangement<'a, T, N> {
         }
     }
 
+    pub fn set_all_in_box(&mut self, lower_corner: &Loc<N>, upper_corner: &Loc<N>, color: &Color) {
+        for pt in self
+            .arrangement
+            .get_within_bounding_box(lower_corner, upper_corner)
+        {
+            self.light_strip.set(pt.data, color);
+        }
+    }
+
+    pub fn set_all_in_radius(&mut self, center: &Loc<N>, radius: f64, color: &Color) {
+        for pt in self.arrangement.get_within_radius(center, radius) {
+            self.light_strip.set(pt.data, color);
+        }
+    }
+
     pub fn fill(&mut self, color: &Color) {
         self.light_strip.fill(color)
     }
 
     pub fn show(&mut self) {
         self.light_strip.show()
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn get_closest() {
+        // let
+        // let light_arrangement: LightStrip<Test> = LightStrip::new();
     }
 }
