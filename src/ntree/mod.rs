@@ -11,8 +11,10 @@ use crate::math::{array_map, array_zip, distance};
 
 use self::{
     intersection::point_intersection,
-    spatial_data_tree::{insert_by_coordinates, spans, DataPoint, SpatialDataTree},
+    spatial_data_tree::{insert_by_coordinates, spans, SpatialDataTree},
 };
+
+pub use spatial_data_tree::DataPoint;
 
 pub struct NTree<'a, T, const N: usize> {
     root: SpatialDataTree<T, N>,
