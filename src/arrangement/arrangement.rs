@@ -9,10 +9,10 @@ pub struct Arrangement<'a, const N: usize> {
 }
 
 impl<'a, const N: usize> Arrangement<'a, N> {
-    pub fn new(locations: &Vec<([f64; N], usize)>) -> Self {
+    pub fn new(config: &ArrangementConfig<N>) -> Self {
         let mut ntree: NTree<'a, usize, N> =
             NTree::new(&|r| r.child_count() >= NUM_CHILDREN_FOR_DIVISION);
-        for (loc, index) in locations {
+        for (loc, index) in config.light_locations.iter() {
             ntree.insert(*index, *loc);
         }
         return Arrangement { ntree };
@@ -44,6 +44,10 @@ impl<'a, const N: usize> Arrangement<'a, N> {
     }
 }
 
+pub struct ArrangementConfig<const N: usize> {
+    light_locations: Vec<([f64; N], usize)>,
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -51,13 +55,15 @@ mod test {
 
     #[test]
     fn get_closest() {
-        let arr = Arrangement::new(&vec![
-            ([0.1, 0.1, 0.1], 1),
-            ([0.9, 0.9, 0.9], 2),
-            ([0.5, 0.5, 0.5], 3),
-            ([0.1, 0.9, 0.1], 4),
-            ([0.1, 0.1, 0.9], 5),
-        ]);
+        let arr = Arrangement::new(&ArrangementConfig {
+            light_locations: vec![
+                ([0.1, 0.1, 0.1], 1),
+                ([0.9, 0.9, 0.9], 2),
+                ([0.5, 0.5, 0.5], 3),
+                ([0.1, 0.9, 0.1], 4),
+                ([0.1, 0.1, 0.9], 5),
+            ],
+        });
         assert_eq!(
             arr.get_closest(&Loc::cartesian([0.2, 0.2, 0.2]), 0.2),
             Some(1)
@@ -79,14 +85,16 @@ mod test {
 
     #[test]
     fn get_radius() {
-        let arr = Arrangement::new(&vec![
-            ([0.1, 0.1, 0.1], 1),
-            ([0.9, 0.9, 0.9], 2),
-            ([0.5, 0.5, 0.5], 3),
-            ([0.1, 0.9, 0.1], 4),
-            ([0.1, 0.1, 0.9], 5),
-            ([0.4, 0.4, 0.4], 6),
-        ]);
+        let arr = Arrangement::new(&ArrangementConfig {
+            light_locations: vec![
+                ([0.1, 0.1, 0.1], 1),
+                ([0.9, 0.9, 0.9], 2),
+                ([0.5, 0.5, 0.5], 3),
+                ([0.1, 0.9, 0.1], 4),
+                ([0.1, 0.1, 0.9], 5),
+                ([0.4, 0.4, 0.4], 6),
+            ],
+        });
         assert_eq!(
             arr.get_within_radius(&Loc::cartesian([0.2, 0.2, 0.2]), 0.2),
             vec![1]
@@ -111,14 +119,16 @@ mod test {
 
     #[test]
     fn get_bounding_box() {
-        let arr = Arrangement::new(&vec![
-            ([0.1, 0.1, 0.1], 1),
-            ([0.9, 0.9, 0.9], 2),
-            ([0.5, 0.5, 0.5], 3),
-            ([0.1, 0.9, 0.1], 4),
-            ([0.1, 0.1, 0.9], 5),
-            ([0.4, 0.4, 0.4], 6),
-        ]);
+        let arr = Arrangement::new(&ArrangementConfig {
+            light_locations: vec![
+                ([0.1, 0.1, 0.1], 1),
+                ([0.9, 0.9, 0.9], 2),
+                ([0.5, 0.5, 0.5], 3),
+                ([0.1, 0.9, 0.1], 4),
+                ([0.1, 0.1, 0.9], 5),
+                ([0.4, 0.4, 0.4], 6),
+            ],
+        });
         assert_eq!(
             arr.get_within_bounding_box(
                 &Loc::cartesian([0.0, 0.0, 0.0]),

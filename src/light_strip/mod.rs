@@ -9,9 +9,9 @@ use rs_ws281x::WS2811Error;
 
 pub trait LightStrip {
     fn get(&self, index: usize) -> Color;
-    fn set(&mut self, index: usize, color: Color);
+    fn set(&mut self, index: usize, color: &Color);
     fn show(&mut self);
-    fn fill(&mut self, color: Color);
+    fn fill(&mut self, color: &Color);
 }
 
 impl dyn LightStrip {
