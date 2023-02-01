@@ -1,5 +1,3 @@
-use std::ptr::copy_nonoverlapping;
-
 /// Interface for talking about locations in coordinate space
 /// Converts cartesian, polar, and cylindrical into float arrays
 

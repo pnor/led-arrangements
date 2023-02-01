@@ -51,15 +51,13 @@ impl<'a, const N: usize> Arrangement<'a, N> {
 }
 
 pub struct ArrangementConfig<const N: usize> {
-    light_locations: Vec<([f64; N], usize)>,
+    pub light_locations: Vec<([f64; N], usize)>,
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
     use crate::loc::Loc;
-
-    // TODO fix the test cases to use datapoint
 
     #[test]
     fn get_closest() {

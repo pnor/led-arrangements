@@ -2,4 +2,6 @@
 mod arrangement;
 mod light_arrangement;
 
-pub use crate::arrangement::light_arrangement::LightArrangement;
+pub use arrangement::Arrangement;
+pub use arrangement::ArrangementConfig;
+pub use light_arrangement::LightArrangement;
