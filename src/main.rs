@@ -18,7 +18,7 @@ fn main() {
         light_locations: light_loc,
     };
 
-    let strip = builder::test(&arrangement_config, &[1, 2, 3]);
+    let strip = builder::test(&arrangement_config, &[0, 1, 2]);
 
     let mut light_arrangement: LightArrangement<TestStrip, 4> =
         LightArrangement::new(strip, arrangement_config);

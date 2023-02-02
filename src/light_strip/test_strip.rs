@@ -1,3 +1,4 @@
+#[cfg(feature = "visualizer")]
 use kiss3d::{
     camera::{ArcBall, Camera},
     light::Light,
@@ -18,13 +19,16 @@ const CAMERA_START: (f32, f32, f32) = (2.0, 0.5, 2.0);
 
 pub struct TestStrip {
     lights: Vec<(u8, u8, u8)>,
-    // #[cfg(feature = "visualizer")]
+    #[cfg(feature = "visualizer")]
     window: Window,
+    #[cfg(feature = "visualizer")]
     objects: Vec<SceneNode>,
+    #[cfg(feature = "visualizer")]
     camera: ArcBall,
 }
 
 impl TestStrip {
+    #[cfg(feature = "visualizer")]
     pub fn new<const N: usize>(
         arrangement_info: &ArrangementConfig<N>,
         dimension_mask: &[u8; 3],
@@ -50,6 +54,15 @@ impl TestStrip {
             camera,
         };
     }
+
+    #[cfg(not(feature = "visualizer"))]
+    pub fn new<const N: usize>(
+        arrangement_info: &ArrangementConfig<N>,
+        dimension_mask: &[u8; 3],
+    ) -> Self {
+        let lights = vec![(0, 0, 0); arrangement_info.light_locations.len()];
+        return Self { lights };
+    }
 }
 
 impl LightStrip for TestStrip {
@@ -61,12 +74,17 @@ impl LightStrip for TestStrip {
     fn set(&mut self, index: usize, color: &Color) {
         self.lights[index] = (color.red, color.green, color.blue);
         let (r, g, b) = color.float_components();
+        #[cfg(feature = "visualizer")]
         self.objects[index].set_color(r, g, b);
     }
 
+    #[cfg(feature = "visualizer")]
     fn show(&mut self) {
         self.window.render_with_camera(&mut self.camera);
     }
+
+    #[cfg(not(feature = "visualizer"))]
+    fn show(&mut self) {}
 
     fn fill(&mut self, color: &Color) {
         self.lights.iter_mut().for_each(|raw| {

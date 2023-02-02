@@ -1,4 +1,4 @@
-// #[cfg(feature = "visualizer")]
+#[cfg(feature = "visualizer")]
 extern crate kiss3d;
 
 pub mod arrangement;
