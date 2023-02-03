@@ -1,6 +1,9 @@
+use std::cmp::max;
+use std::fmt::Debug;
+
 /// Representing Colors to assign to lights in the LED Strip
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct Color {
     pub red: u8,
     pub green: u8,
@@ -25,5 +28,22 @@ impl Color {
         let g = self.green as f32 / 255.0;
         let b = self.blue as f32 / 255.0;
         return (r, g, b);
+    }
+
+    /// Merges this color with `other`
+    pub fn merge(&mut self, other: Color) {
+        self.red = max(self.red, other.red);
+        self.green = max(self.green, other.green);
+        self.blue = max(self.blue, other.blue);
+    }
+}
+
+impl Debug for Color {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Color")
+            .field("red", &self.red)
+            .field("green", &self.green)
+            .field("blue", &self.blue)
+            .finish()
     }
 }

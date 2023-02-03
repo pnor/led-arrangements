@@ -33,6 +33,16 @@ pub fn array_zip<const N: usize>(
         )
 }
 
+pub fn clamp(number: f64, lower: f64, upper: f64) -> f64 {
+    if number < lower {
+        return lower;
+    } else if number > upper {
+        return upper;
+    } else {
+        return number;
+    }
+}
+
 mod test {
     use super::*;
 
@@ -69,5 +79,13 @@ mod test {
         assert_eq!(arr1, [0.0, 1.0, 2.0, 3.0]);
         assert_eq!(arr2, [3.0, 2.0, 1.0, 0.0]);
         assert_eq!(res, [0.0, 2.0, 2.0, 0.0]);
+    }
+
+    #[test]
+    fn test_clamp() {
+        assert_eq!(clamp(1.0, 0.0, 2.0), 1.0);
+        assert_eq!(clamp(0.0, 0.0, 2.0), 0.0);
+        assert_eq!(clamp(-1.0, 0.0, 2.0), 0.0);
+        assert_eq!(clamp(3.0, 0.0, 2.0), 2.0);
     }
 }
