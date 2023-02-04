@@ -13,7 +13,7 @@ use crate::{
     color::Color,
 };
 
-const SPHERE_SIZE: f32 = 0.05;
+const SPHERE_SIZE: f32 = 0.01;
 const CENTER_POINT: (f32, f32, f32) = (0.5, 0.5, 0.5);
 const CAMERA_START: (f32, f32, f32) = (2.0, 0.5, 2.0);
 
@@ -73,6 +73,7 @@ impl LightStrip for TestStrip {
 
     fn set(&mut self, index: usize, color: &Color) {
         self.lights[index] = (color.red, color.green, color.blue);
+        #[cfg(feature = "visualizer")]
         let (r, g, b) = color.float_components();
         #[cfg(feature = "visualizer")]
         self.objects[index].set_color(r, g, b);
@@ -86,11 +87,25 @@ impl LightStrip for TestStrip {
     #[cfg(not(feature = "visualizer"))]
     fn show(&mut self) {}
 
+    #[cfg(not(feature = "visualizer"))]
     fn fill(&mut self, color: &Color) {
         self.lights.iter_mut().for_each(|raw| {
             raw.0 = color.red;
             raw.1 = color.green;
             raw.2 = color.blue;
+        });
+    }
+
+    #[cfg(feature = "visualizer")]
+    fn fill(&mut self, color: &Color) {
+        self.lights.iter_mut().for_each(|raw| {
+            raw.0 = color.red;
+            raw.1 = color.green;
+            raw.2 = color.blue;
+        });
+        let (r, g, b) = color.float_components();
+        self.objects.iter_mut().for_each(|obj| {
+            obj.set_color(r, g, b);
         });
     }
 }
