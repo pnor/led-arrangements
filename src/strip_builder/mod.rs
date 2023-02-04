@@ -2,7 +2,7 @@ use rs_ws281x::WS2811Error;
 
 use crate::{
     light_strip::{TestStrip, Ws281xStrip},
-    ArrangementConfig, LightConfig,
+    ArrangementConfig, LightConfig, TestStripDisplayConfig,
 };
 
 pub fn ws281x(config: LightConfig) -> Result<Ws281xStrip, WS2811Error> {
@@ -10,8 +10,8 @@ pub fn ws281x(config: LightConfig) -> Result<Ws281xStrip, WS2811Error> {
 }
 
 pub fn test<const N: usize>(
-    arrangement_info: &ArrangementConfig<N>,
-    dimension_mask: &[u8; 3],
+    arrangement_config: &ArrangementConfig<N>,
+    display_config: &TestStripDisplayConfig,
 ) -> TestStrip {
-    TestStrip::new(arrangement_info, dimension_mask)
+    TestStrip::new(arrangement_config, display_config)
 }

@@ -5,7 +5,7 @@ mod ws281x_strip;
 
 use crate::color::Color;
 
-pub use test_strip::TestStrip;
+pub use test_strip::{TestStrip, TestStripDisplayConfig};
 pub use ws281x_strip::Ws281xStrip;
 
 pub trait LightStrip {

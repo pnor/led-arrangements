@@ -1,4 +1,5 @@
 use super::arrangement_config::ArrangementConfig;
+use super::arrangement_config::ArrangementConfigError;
 use crate::loc::Loc;
 use crate::ntree::DataPoint;
 use crate::ntree::NTree;
@@ -11,13 +12,20 @@ pub struct Arrangement<'a, const N: usize> {
 }
 
 impl<'a, const N: usize> Arrangement<'a, N> {
-    pub fn new(config: &ArrangementConfig<N>) -> Self {
+    pub fn new(config: &ArrangementConfig<N>) -> Result<Self, ArrangementConfigError> {
         let mut ntree: NTree<'a, usize, N> =
             NTree::new(&|r| r.child_count() >= NUM_CHILDREN_FOR_DIVISION);
         for (loc, index) in config.light_locations.iter() {
-            ntree.insert(*index, *loc);
+            let res = ntree.insert(*index, *loc);
+            if res.is_err() {
+                return Err(ArrangementConfigError::new(format!(
+                    "Tried to insert index {}
+    outside of range",
+                    *index
+                )));
+            }
         }
-        return Arrangement { ntree };
+        return Ok(Arrangement { ntree });
     }
 
     pub fn get_closest(
@@ -53,6 +61,8 @@ impl<'a, const N: usize> Arrangement<'a, N> {
 
 #[cfg(test)]
 mod test {
+    use std::error::Error;
+
     use super::*;
     use crate::loc::Loc;
 
@@ -66,7 +76,8 @@ mod test {
                 ([0.1, 0.9, 0.1], 4),
                 ([0.1, 0.1, 0.9], 5),
             ],
-        });
+        })
+        .unwrap();
         assert_eq!(
             arr.get_closest(&Loc::cartesian([0.2, 0.2, 0.2]), 0.2)
                 .unwrap()
@@ -103,7 +114,7 @@ mod test {
     }
 
     #[test]
-    fn get_radius() {
+    fn get_radius() -> Result<(), Box<dyn Error>> {
         let arr = Arrangement::new(&ArrangementConfig {
             light_locations: vec![
                 ([0.1, 0.1, 0.1], 1),
@@ -113,7 +124,7 @@ mod test {
                 ([0.1, 0.1, 0.9], 5),
                 ([0.4, 0.4, 0.4], 6),
             ],
-        });
+        })?;
         assert_eq!(
             arr.get_within_radius(&Loc::cartesian([0.2, 0.2, 0.2]), 0.2)
                 .iter()
@@ -149,10 +160,12 @@ mod test {
                 .collect::<Vec<usize>>(),
             vec![1, 2, 3, 4, 5, 6]
         );
+
+        return Ok(());
     }
 
     #[test]
-    fn get_bounding_box() {
+    fn get_bounding_box() -> Result<(), Box<dyn Error>> {
         let arr = Arrangement::new(&ArrangementConfig {
             light_locations: vec![
                 ([0.1, 0.1, 0.1], 1),
@@ -162,7 +175,7 @@ mod test {
                 ([0.1, 0.1, 0.9], 5),
                 ([0.4, 0.4, 0.4], 6),
             ],
-        });
+        })?;
         assert_eq!(
             arr.get_within_bounding_box(
                 &Loc::cartesian([0.0, 0.0, 0.0]),
@@ -203,5 +216,7 @@ mod test {
             .collect::<Vec<usize>>(),
             vec![1, 2, 3, 4, 5, 6]
         );
+
+        return Ok(());
     }
 }

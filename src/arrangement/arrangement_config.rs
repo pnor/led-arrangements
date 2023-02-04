@@ -84,6 +84,12 @@ pub struct ArrangementConfigError {
     reason: String,
 }
 
+impl ArrangementConfigError {
+    pub fn new(reason: String) -> Self {
+        ArrangementConfigError { reason }
+    }
+}
+
 impl Error for ArrangementConfigError {}
 
 impl fmt::Display for ArrangementConfigError {

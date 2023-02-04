@@ -1,5 +1,8 @@
 // use led_arrangements::LightStrip;
-use led_arrangements::{strip_builder, ArrangementConfig, Color, LightArrangement, Loc, TestStrip};
+use led_arrangements::{
+    strip_builder, ArrangementConfig, Color, LightArrangement, Loc, TestStrip,
+    TestStripDisplayConfig,
+};
 use std::{f64::consts::PI, time::Duration};
 
 fn get_light_locs() -> Vec<([f64; 3], usize)> {
@@ -24,10 +27,12 @@ fn main() {
         light_locations: get_light_locs(),
     };
 
-    let strip = strip_builder::test(&arrangement_config, &[0, 1, 2]);
+    let display_config = TestStripDisplayConfig::default();
+
+    let strip = strip_builder::test(&arrangement_config, &display_config);
 
     let mut light_arrangement: LightArrangement<TestStrip, 3> =
-        LightArrangement::new(strip, arrangement_config);
+        LightArrangement::new(strip, arrangement_config).unwrap();
 
     light_arrangement.fill(&Color {
         red: 0,

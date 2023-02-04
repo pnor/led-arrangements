@@ -1,18 +1,13 @@
 #[cfg(feature = "visualizer")]
 use kiss3d::{
-    camera::{ArcBall, Camera},
-    light::Light,
-    nalgebra::{OPoint, Point3, Translation3},
+    camera::ArcBall,
+    nalgebra::{Point3, Translation3},
     scene::SceneNode,
     window::Window,
 };
 
 use super::LightStrip;
 use crate::{arrangement::ArrangementConfig, color::Color};
-
-const SPHERE_SIZE: f32 = 0.01;
-const CENTER_POINT: (f32, f32, f32) = (0.5, 0.5, 0.5);
-const CAMERA_START: (f32, f32, f32) = (2.0, 0.5, 2.0);
 
 pub struct TestStrip {
     lights: Vec<(u8, u8, u8)>,
@@ -27,20 +22,25 @@ pub struct TestStrip {
 impl TestStrip {
     #[cfg(feature = "visualizer")]
     pub fn new<const N: usize>(
-        arrangement_info: &ArrangementConfig<N>,
-        dimension_mask: &[u8; 3],
+        arrangement_config: &ArrangementConfig<N>,
+        display_config: &TestStripDisplayConfig,
     ) -> Self {
-        let lights = vec![(0, 0, 0); arrangement_info.light_locations.len()];
+        let lights = vec![(0, 0, 0); arrangement_config.light_locations.len()];
         let mut window = Window::new("Demo");
+        let camera_start = &display_config.camera_start;
+        let center_point = &display_config.center_point;
         let camera = ArcBall::new(
-            Point3::new(CAMERA_START.0, CAMERA_START.1, CAMERA_START.2),
-            Point3::new(CENTER_POINT.0, CENTER_POINT.1, CENTER_POINT.2),
+            Point3::new(camera_start.0, camera_start.1, camera_start.2),
+            Point3::new(center_point.0, center_point.1, center_point.2),
         );
 
         let mut objects: Vec<SceneNode> = vec![];
-        for i in 0..arrangement_info.light_locations.len() {
-            objects.push(window.add_sphere(SPHERE_SIZE));
-            let pt = coord_to_3d_cord(&arrangement_info.light_locations[i].0, &dimension_mask);
+        for i in 0..arrangement_config.light_locations.len() {
+            objects.push(window.add_sphere(display_config.sphere_size));
+            let pt = coord_to_3d_cord(
+                &arrangement_config.light_locations[i].0,
+                &display_config.dimension_mask,
+            );
             objects[i].prepend_to_local_translation(&Translation3::new(pt[0], pt[1], pt[2]));
         }
 
@@ -54,10 +54,10 @@ impl TestStrip {
 
     #[cfg(not(feature = "visualizer"))]
     pub fn new<const N: usize>(
-        arrangement_info: &ArrangementConfig<N>,
-        dimension_mask: &[u8; 3],
+        arrangement_config: &ArrangementConfig<N>,
+        display_config: &TestStripDisplayConfig,
     ) -> Self {
-        let lights = vec![(0, 0, 0); arrangement_info.light_locations.len()];
+        let lights = vec![(0, 0, 0); arrangement_config.light_locations.len()];
         return Self { lights };
     }
 }
@@ -129,4 +129,31 @@ fn coord_to_3d_cord<const N: usize>(point: &[f64; N], dimension_mask: &[u8; 3]) 
         }
     }
     return output;
+}
+
+pub struct TestStripDisplayConfig {
+    sphere_size: f32,
+    center_point: (f32, f32, f32),
+    camera_start: (f32, f32, f32),
+    dimension_mask: [u8; 3],
+}
+
+impl TestStripDisplayConfig {
+    pub fn default() -> Self {
+        TestStripDisplayConfig {
+            sphere_size: 0.02,
+            center_point: (0.5, 0.5, 0.5),
+            camera_start: (2.0, 0.5, 2.0),
+            dimension_mask: [0, 1, 2],
+        }
+    }
+
+    pub fn new(sphere_size: f32, camera_start: (f32, f32, f32), dimension_mask: [u8; 3]) -> Self {
+        TestStripDisplayConfig {
+            sphere_size,
+            center_point: (0.5, 0.5, 0.5),
+            camera_start,
+            dimension_mask,
+        }
+    }
 }

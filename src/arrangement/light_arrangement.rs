@@ -1,5 +1,5 @@
-use super::arrangement::Arrangement;
 use super::arrangement_config::ArrangementConfig;
+use super::{arrangement::Arrangement, arrangement_config::ArrangementConfigError};
 use crate::{color::Color, light_strip::LightStrip, loc::Loc, math::distance};
 
 /// Uses Arrangement and LightStrip to assign to lights based on lcation in N dimensional space
@@ -9,11 +9,14 @@ pub struct LightArrangement<'a, T: LightStrip, const N: usize> {
 }
 
 impl<'a, T: LightStrip, const N: usize> LightArrangement<'a, T, N> {
-    pub fn new(light_strip: T, arrangement_config: ArrangementConfig<N>) -> Self {
-        LightArrangement {
-            arrangement: Arrangement::new(&arrangement_config),
+    pub fn new(
+        light_strip: T,
+        arrangement_config: ArrangementConfig<N>,
+    ) -> Result<Self, ArrangementConfigError> {
+        Ok(LightArrangement {
+            arrangement: Arrangement::new(&arrangement_config)?,
             light_strip,
-        }
+        })
     }
 
     pub fn get_closest(&self, loc: &Loc<N>, max_search_distance: f64) -> Option<Color> {
@@ -91,11 +94,14 @@ impl<'a, T: LightStrip, const N: usize> LightArrangement<'a, T, N> {
 
 #[cfg(test)]
 mod test {
-    use crate::{light_strip, math::clamp, Loc, TestStrip};
+    use std::error::Error;
+
+    use crate::{math::clamp, Loc, TestStrip, TestStripDisplayConfig};
 
     use super::*;
 
-    fn make_light_arrangement<'a>() -> LightArrangement<'a, TestStrip, 2> {
+    fn make_light_arrangement<'a>(
+    ) -> Result<LightArrangement<'a, TestStrip, 2>, ArrangementConfigError> {
         let arrangement_config = ArrangementConfig {
             light_locations: vec![
                 ([0.2, 0.2], 0),
@@ -126,14 +132,14 @@ mod test {
             ],
         };
 
-        let light_strip = TestStrip::new(&arrangement_config, &[0, 1, 2]);
-        let light_arrangement = LightArrangement::new(light_strip, arrangement_config);
-        return light_arrangement;
+        let light_strip = TestStrip::new(&arrangement_config, &TestStripDisplayConfig::default());
+        let light_arrangement = LightArrangement::new(light_strip, arrangement_config)?;
+        return Ok(light_arrangement);
     }
 
     #[test]
-    fn fill() {
-        let mut light_arrangement = make_light_arrangement();
+    fn fill() -> Result<(), Box<dyn Error>> {
+        let mut light_arrangement = make_light_arrangement()?;
 
         let mut fill_color = Color {
             red: 0,
@@ -166,11 +172,13 @@ mod test {
                 );
             }
         }
+
+        return Ok(());
     }
 
     #[test]
-    fn get_and_set_closest() {
-        let mut light_arrangement = make_light_arrangement();
+    fn get_and_set_closest() -> Result<(), Box<dyn Error>> {
+        let mut light_arrangement = make_light_arrangement()?;
 
         let mut color = Color {
             red: 255,
@@ -199,11 +207,13 @@ mod test {
             light_arrangement.get_closest(&Loc::cartesian([0.4, 0.2]), 0.2),
             Some(color)
         );
+
+        return Ok(());
     }
 
     #[test]
-    fn set_decreasing_intensity() {
-        let mut light_arrangement = make_light_arrangement();
+    fn set_decreasing_intensity() -> Result<(), Box<dyn Error>> {
+        let mut light_arrangement = make_light_arrangement()?;
 
         let color = Color {
             red: 255,
@@ -228,11 +238,13 @@ mod test {
                 );
             }
         }
+
+        return Ok(());
     }
 
     #[test]
-    fn set_decreasing_intensity_merging() {
-        let mut light_arrangement = make_light_arrangement();
+    fn set_decreasing_intensity_merging() -> Result<(), Box<dyn Error>> {
+        let mut light_arrangement = make_light_arrangement()?;
 
         let color1 = Color {
             red: 255,
@@ -263,11 +275,13 @@ mod test {
                 );
             }
         }
+
+        return Ok(());
     }
 
     #[test]
-    fn set_all_in_radius() {
-        let mut light_arrangement = make_light_arrangement();
+    fn set_all_in_radius() -> Result<(), Box<dyn Error>> {
+        let mut light_arrangement = make_light_arrangement()?;
 
         let color = Color {
             red: 255,
@@ -301,11 +315,13 @@ mod test {
                 }
             }
         }
+
+        return Ok(());
     }
 
     #[test]
-    fn set_all_in_box() {
-        let mut light_arrangement = make_light_arrangement();
+    fn set_all_in_box() -> Result<(), Box<dyn Error>> {
+        let mut light_arrangement = make_light_arrangement()?;
 
         let color = Color {
             red: 255,
@@ -366,5 +382,7 @@ mod test {
                 blue: 0
             })
         );
+
+        return Ok(());
     }
 }
