@@ -1,3 +1,4 @@
+use super::arrangement_config::ArrangementConfig;
 use crate::loc::Loc;
 use crate::ntree::DataPoint;
 use crate::ntree::NTree;
@@ -48,10 +49,6 @@ impl<'a, const N: usize> Arrangement<'a, N> {
         self.ntree
             .find_in_box(&lower_corner.coords, &upper_corner.coords)
     }
-}
-
-pub struct ArrangementConfig<const N: usize> {
-    pub light_locations: Vec<([f64; N], usize)>,
 }
 
 #[cfg(test)]

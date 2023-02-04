@@ -1,4 +1,5 @@
-use super::arrangement::{Arrangement, ArrangementConfig};
+use super::arrangement::Arrangement;
+use super::arrangement_config::ArrangementConfig;
 use crate::{color::Color, light_strip::LightStrip, loc::Loc, math::distance};
 
 /// Uses Arrangement and LightStrip to assign to lights based on lcation in N dimensional space
