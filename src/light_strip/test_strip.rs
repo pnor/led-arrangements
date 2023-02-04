@@ -7,11 +7,8 @@ use kiss3d::{
     window::Window,
 };
 
-use super::{LightConfig, LightStrip};
-use crate::{
-    arrangement::{Arrangement, ArrangementConfig},
-    color::Color,
-};
+use super::LightStrip;
+use crate::{arrangement::ArrangementConfig, color::Color};
 
 const SPHERE_SIZE: f32 = 0.01;
 const CENTER_POINT: (f32, f32, f32) = (0.5, 0.5, 0.5);

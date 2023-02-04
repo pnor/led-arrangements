@@ -1,6 +1,6 @@
 // use led_arrangements::LightStrip;
 use led_arrangements::{strip_builder, ArrangementConfig, Color, LightArrangement, Loc, TestStrip};
-use std::{f64::consts::PI, thread::sleep, time::Duration};
+use std::{f64::consts::PI, time::Duration};
 
 fn get_light_locs() -> Vec<([f64; 3], usize)> {
     let mut counter = 0;

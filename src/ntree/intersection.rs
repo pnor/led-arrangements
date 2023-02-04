@@ -39,6 +39,7 @@ pub fn point_intersection<const N: usize>(
         .is_none()
 }
 
+#[cfg(test)]
 mod test {
     use super::*;
 

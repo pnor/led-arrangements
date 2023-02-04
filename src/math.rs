@@ -43,6 +43,7 @@ pub fn clamp(number: f64, lower: f64, upper: f64) -> f64 {
     }
 }
 
+#[cfg(test)]
 mod test {
     use super::*;
 

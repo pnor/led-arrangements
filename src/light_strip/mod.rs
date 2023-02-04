@@ -3,9 +3,7 @@
 mod test_strip;
 mod ws281x_strip;
 
-use crate::{arrangement::ArrangementConfig, color::Color};
-
-use rs_ws281x::WS2811Error;
+use crate::color::Color;
 
 pub use test_strip::TestStrip;
 pub use ws281x_strip::Ws281xStrip;

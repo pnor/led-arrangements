@@ -244,11 +244,6 @@ mod test {
             green: 255,
             blue: 0,
         };
-        let color3 = Color {
-            red: 255,
-            green: 255,
-            blue: 0,
-        };
         light_arrangement.set_decreasing_intensity_merge(&Loc::cartesian([0.5, 0.5]), &color1, 1.0);
         light_arrangement.set_decreasing_intensity_merge(&Loc::cartesian([0.5, 0.5]), &color2, 1.0);
 
