@@ -52,8 +52,8 @@ impl<'a, T: LightStrip, const N: usize> LightArrangement<'a, T, N> {
     pub fn set_decreasing_intensity_merge(
         &mut self,
         loc: &Loc<N>,
-        color: &Color,
         set_distance: f64,
+        color: &Color,
     ) {
         let datapoints = self.arrangement.get_within_radius(loc, set_distance);
         for pt in datapoints.iter() {
@@ -256,8 +256,8 @@ mod test {
             green: 255,
             blue: 0,
         };
-        light_arrangement.set_decreasing_intensity_merge(&Loc::cartesian([0.5, 0.5]), &color1, 1.0);
-        light_arrangement.set_decreasing_intensity_merge(&Loc::cartesian([0.5, 0.5]), &color2, 1.0);
+        light_arrangement.set_decreasing_intensity_merge(&Loc::cartesian([0.5, 0.5]), 1.0, &color1);
+        light_arrangement.set_decreasing_intensity_merge(&Loc::cartesian([0.5, 0.5]), 1.0, &color2);
 
         for i in [0.2, 0.4, 0.6, 0.8, 1.0] {
             for j in [0.2, 0.4, 0.6, 0.8, 1.0] {

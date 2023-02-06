@@ -88,6 +88,10 @@ impl ArrangementConfigError {
     pub fn new(reason: String) -> Self {
         ArrangementConfigError { reason }
     }
+
+    pub fn reason(&self) -> String {
+        String::from(&self.reason)
+    }
 }
 
 impl Error for ArrangementConfigError {}

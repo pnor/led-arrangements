@@ -10,6 +10,7 @@ mod ntree;
 pub mod strip_builder;
 
 pub use arrangement::ArrangementConfig;
+pub use arrangement::ArrangementConfigError;
 pub use arrangement::LightArrangement;
 pub use color::Color;
 pub use light_strip::{LightConfig, LightStrip, TestStrip, TestStripDisplayConfig, Ws281xStrip};

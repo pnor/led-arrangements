@@ -41,10 +41,15 @@ fn main() {
     });
     light_arrangement.show();
 
-    let color = Color {
+    let color1 = Color {
         red: 255,
         green: 0,
         blue: 0,
+    };
+    let color2 = Color {
+        red: 0,
+        green: 0,
+        blue: 255,
     };
 
     let mut prog = 0.0;
@@ -54,16 +59,21 @@ fn main() {
             green: 0,
             blue: 0,
         });
-        light_arrangement.set_decreasing_intensity(
+        light_arrangement.set_decreasing_intensity_merge(
             &Loc::polar(0.4, &vec![PI / 2.0, (PI * 2.0 * prog)], &[0.5, 0.5, 0.5]),
             0.3,
-            &color,
+            &color1,
+        );
+        light_arrangement.set_decreasing_intensity_merge(
+            &Loc::polar(0.4, &vec![(PI * 2.0 * prog), PI / 2.0], &[0.5, 0.5, 0.5]),
+            0.3,
+            &color2,
         );
 
         light_arrangement.show();
 
         prog = (prog + 0.03) % 1.0;
 
-        std::thread::sleep(Duration::from_millis(25));
+        // std::thread::sleep(Duration::from_millis(25));
     }
 }
