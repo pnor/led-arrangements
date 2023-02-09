@@ -21,7 +21,7 @@ pub struct LightConfig {
 }
 
 impl LightConfig {
-    fn new(number_lights: i32, io_pin: i32) -> Self {
+    pub fn new(number_lights: i32, io_pin: i32) -> Self {
         LightConfig {
             number_lights,
             io_pin,

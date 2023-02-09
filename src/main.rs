@@ -1,6 +1,6 @@
 // use led_arrangements::LightStrip;
 use led_arrangements::{
-    strip_builder, ArrangementConfig, Color, LightArrangement, Loc, TestStrip,
+    strip_builder, ArrangementConfig, Color, LightArrangement, LightConfig, Loc, TestStrip,
     TestStripDisplayConfig,
 };
 use std::{f64::consts::PI, time::Duration};
