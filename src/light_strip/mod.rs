@@ -16,6 +16,15 @@ pub trait LightStrip {
 }
 
 pub struct LightConfig {
-    pub number_lights: i32,
-    pub io_pin: i32,
+    number_lights: i32,
+    io_pin: i32,
+}
+
+impl LightConfig {
+    fn new(number_lights: i32, io_pin: i32) -> Self {
+        LightConfig {
+            number_lights,
+            io_pin,
+        }
+    }
 }
