@@ -16,28 +16,26 @@ use self::{
 
 pub use spatial_data_tree::DataPoint;
 
-pub struct NTree<'a, T, const N: usize> {
+pub struct NTree<T, const N: usize> {
     root: SpatialDataTree<T, N>,
-    division_condition: &'a dyn Fn(&SpatialDataTree<T, N>) -> bool,
+    number_children_to_divide: usize,
 }
 
-impl<'a: 'b, 'b, T: 'a, const N: usize> NTree<'a, T, N> {
+impl<T, const N: usize> NTree<T, N> {
     /// Creates an `NTree` spanning 0..1 in all dimensions
-    pub fn new(division_condition: &'a dyn Fn(&SpatialDataTree<T, N>) -> bool) -> Self {
+    pub fn new(number_children_to_divide: usize) -> Self {
         NTree {
             root: SpatialTree::new([0.5; N], [0.5; N], 0),
-            division_condition,
+            number_children_to_divide,
         }
     }
 
     /// Inserts a datapoint with `data` locoated at `point`
     /// `point` should be within 0..1 on all dimensions
     pub fn insert(&mut self, data: T, point: [f64; N]) -> Result<(), TpnTreeError> {
-        insert_by_coordinates(
-            &mut self.root,
-            DataPoint { data, point },
-            self.division_condition,
-        )
+        insert_by_coordinates(&mut self.root, DataPoint { data, point }, &|t| {
+            t.data().map_or(0, |v| v.len()) > self.number_children_to_divide
+        })
     }
 
     /// Returns the datapoint closest to `point` that is <= `max_distance` away from `point`
@@ -68,11 +66,7 @@ impl<'a: 'b, 'b, T: 'a, const N: usize> NTree<'a, T, N> {
     }
 
     /// Returns all datapoints within the box region described by the corner points `corner1` and `corner2`.
-    pub fn find_in_box(
-        &'a self,
-        corner1: &'b [f64; N],
-        corner2: &'b [f64; N],
-    ) -> Vec<&'a DataPoint<T, N>> {
+    pub fn find_in_box(&self, corner1: &[f64; N], corner2: &[f64; N]) -> Vec<&DataPoint<T, N>> {
         let mut datapoints = vec![];
         for tree in trees_in_box(&self.root, corner1, corner2) {
             if let Some(tree_data) = tree.data() {
@@ -86,7 +80,7 @@ impl<'a: 'b, 'b, T: 'a, const N: usize> NTree<'a, T, N> {
         return datapoints;
     }
 
-    pub fn find_in_radius(&'a self, point: &'b [f64; N], radius: f64) -> Vec<&'a DataPoint<T, N>> {
+    pub fn find_in_radius(&self, point: &[f64; N], radius: f64) -> Vec<&DataPoint<T, N>> {
         let corner1 = array_map(&point, &|x| x - radius);
         let corner2 = array_map(&point, &|x| x + radius);
         let points = self.find_in_box(&corner1, &corner2);
@@ -105,10 +99,10 @@ impl<'a: 'b, 'b, T: 'a, const N: usize> NTree<'a, T, N> {
 
 /// Returns all child TpnTrees whose span intersects the box region described by the corner points
 /// `corner1` and `corner2`
-fn trees_in_box<'a: 'b, 'b, T, const N: usize>(
+fn trees_in_box<'a, T, const N: usize>(
     root: &'a SpatialDataTree<T, N>,
-    corner1: &'b [f64; N],
-    corner2: &'b [f64; N],
+    corner1: &[f64; N],
+    corner2: &[f64; N],
 ) -> Vec<&'a SpatialDataTree<T, N>> {
     let span = root.span();
     let center = root.coordinates();
@@ -138,12 +132,12 @@ mod test {
 
     #[test]
     fn create_tree() {
-        let _root: NTree<i32, 1> = NTree::new(&|t| t.data().unwrap_or(&vec![]).len() > 1);
+        let _root: NTree<i32, 1> = NTree::new(1);
     }
 
     #[test]
     fn insert_1_d() {
-        let mut root: NTree<i32, 1> = NTree::new(&|t| t.data().unwrap_or(&vec![]).len() > 1);
+        let mut root: NTree<i32, 1> = NTree::new(1);
         // insert inside span
         assert!(root.insert(1, [0.2]).is_ok());
         assert!(root.insert(1, [0.3]).is_ok());
@@ -156,7 +150,7 @@ mod test {
 
     #[test]
     fn insert_2_d() {
-        let mut root: NTree<i32, 2> = NTree::new(&|t| t.data().unwrap_or(&vec![]).len() > 1);
+        let mut root: NTree<i32, 2> = NTree::new(1);
         // insert inside span
         assert!(root.insert(1, [0.5, 0.5]).is_ok());
         assert!(root.insert(1, [0.1, 0.8]).is_ok());
@@ -171,7 +165,7 @@ mod test {
 
     #[test]
     fn insert_4_d() {
-        let mut root: NTree<i32, 4> = NTree::new(&|t| t.data().unwrap_or(&vec![]).len() > 1);
+        let mut root: NTree<i32, 4> = NTree::new(1);
         // insert inside span
         assert!(root.insert(1, [0.0, 0.0, 0.0, 0.0]).is_ok());
         assert!(root.insert(1, [1.0, 1.0, 1.0, 1.0]).is_ok());
@@ -186,7 +180,7 @@ mod test {
 
     #[test]
     fn closest_1d() -> Result<(), TpnTreeError> {
-        let mut root: NTree<i32, 1> = NTree::new(&|t| t.data().unwrap_or(&vec![]).len() > 1);
+        let mut root: NTree<i32, 1> = NTree::new(1);
         // insert into the tree
         assert!(root.insert(1, [0.2]).is_ok());
         assert!(root.insert(2, [0.4]).is_ok());
@@ -212,7 +206,7 @@ mod test {
 
     #[test]
     fn closest_3d() -> Result<(), TpnTreeError> {
-        let mut root: NTree<i32, 3> = NTree::new(&|t| t.data().unwrap_or(&vec![]).len() > 1);
+        let mut root: NTree<i32, 3> = NTree::new(1);
         // insert into the tree
         assert!(root.insert(1, [0.0, 0.0, 0.0]).is_ok());
         assert!(root.insert(2, [1.0, 1.0, 1.0]).is_ok());
@@ -234,7 +228,7 @@ mod test {
 
     #[test]
     fn find_in_box_1d() {
-        let mut root: NTree<i32, 1> = NTree::new(&|t| t.data().unwrap_or(&vec![]).len() > 1);
+        let mut root: NTree<i32, 1> = NTree::new(1);
 
         assert!(root.insert(1, [0.0]).is_ok());
         assert!(root.insert(2, [0.2]).is_ok());
@@ -278,7 +272,7 @@ mod test {
 
     #[test]
     fn find_in_box_3d() {
-        let mut root: NTree<i32, 3> = NTree::new(&|t| t.data().unwrap_or(&vec![]).len() > 1);
+        let mut root: NTree<i32, 3> = NTree::new(1);
 
         assert!(root.insert(1, [0.0, 0.0, 0.0]).is_ok());
         assert!(root.insert(2, [1.0, 1.0, 1.0]).is_ok());
@@ -312,7 +306,7 @@ mod test {
 
     #[test]
     fn find_in_radius_3d() {
-        let mut root: NTree<i32, 3> = NTree::new(&|t| t.data().unwrap_or(&vec![]).len() > 1);
+        let mut root: NTree<i32, 3> = NTree::new(1);
 
         assert!(root.insert(1, [0.0, 0.0, 0.0]).is_ok());
         assert!(root.insert(2, [1.0, 1.0, 1.0]).is_ok());

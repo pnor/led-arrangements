@@ -7,14 +7,13 @@ use crate::ntree::NTree;
 const NUM_CHILDREN_FOR_DIVISION: usize = 3;
 
 /// Manages the mapping from light index to location in N-dimensional space
-pub struct Arrangement<'a, const N: usize> {
-    ntree: NTree<'a, usize, N>,
+pub struct Arrangement<const N: usize> {
+    ntree: NTree<usize, N>,
 }
 
-impl<'a, const N: usize> Arrangement<'a, N> {
+impl<const N: usize> Arrangement<N> {
     pub fn new(config: &ArrangementConfig<N>) -> Result<Self, ArrangementConfigError> {
-        let mut ntree: NTree<'a, usize, N> =
-            NTree::new(&|r| r.child_count() >= NUM_CHILDREN_FOR_DIVISION);
+        let mut ntree: NTree<usize, N> = NTree::new(NUM_CHILDREN_FOR_DIVISION);
         for (loc, index) in config.light_locations.iter() {
             let res = ntree.insert(*index, *loc);
             if res.is_err() {
@@ -125,41 +124,41 @@ mod test {
                 ([0.4, 0.4, 0.4], 6),
             ],
         })?;
-        assert_eq!(
-            arr.get_within_radius(&Loc::cartesian([0.2, 0.2, 0.2]), 0.2)
-                .iter()
-                .map(|pt| pt.data)
-                .collect::<Vec<usize>>(),
-            vec![1]
-        );
-        assert_eq!(
-            arr.get_within_radius(&Loc::cartesian([0.3, 0.3, 0.3]), 0.1)
-                .iter()
-                .map(|pt| pt.data)
-                .collect::<Vec<usize>>(),
-            vec![]
-        );
-        assert_eq!(
-            arr.get_within_radius(&Loc::cartesian([0.45, 0.45, 0.5]), 0.08)
-                .iter()
-                .map(|pt| pt.data)
-                .collect::<Vec<usize>>(),
-            vec![3]
-        );
-        assert_eq!(
-            arr.get_within_radius(&Loc::cartesian([0.5, 0.5, 0.5]), 0.5)
-                .iter()
-                .map(|pt| pt.data)
-                .collect::<Vec<usize>>(),
-            vec![3, 6]
-        );
-        assert_eq!(
-            arr.get_within_radius(&Loc::cartesian([0.5, 0.5, 0.5]), 0.9)
-                .iter()
-                .map(|pt| pt.data)
-                .collect::<Vec<usize>>(),
-            vec![1, 2, 3, 4, 5, 6]
-        );
+        let mut v = arr
+            .get_within_radius(&Loc::cartesian([0.2, 0.2, 0.2]), 0.2)
+            .iter()
+            .map(|pt| pt.data)
+            .collect::<Vec<usize>>();
+        v.sort();
+        assert_eq!(v, vec![1]);
+        let mut v = arr
+            .get_within_radius(&Loc::cartesian([0.3, 0.3, 0.3]), 0.1)
+            .iter()
+            .map(|pt| pt.data)
+            .collect::<Vec<usize>>();
+        v.sort();
+        assert_eq!(v, vec![]);
+        let mut v = arr
+            .get_within_radius(&Loc::cartesian([0.45, 0.45, 0.5]), 0.08)
+            .iter()
+            .map(|pt| pt.data)
+            .collect::<Vec<usize>>();
+        v.sort();
+        assert_eq!(v, vec![3]);
+        let mut v = arr
+            .get_within_radius(&Loc::cartesian([0.5, 0.5, 0.5]), 0.5)
+            .iter()
+            .map(|pt| pt.data)
+            .collect::<Vec<usize>>();
+        v.sort();
+        assert_eq!(v, vec![3, 6]);
+        let mut v = arr
+            .get_within_radius(&Loc::cartesian([0.5, 0.5, 0.5]), 0.9)
+            .iter()
+            .map(|pt| pt.data)
+            .collect::<Vec<usize>>();
+        v.sort();
+        assert_eq!(v, vec![1, 2, 3, 4, 5, 6]);
 
         return Ok(());
     }
