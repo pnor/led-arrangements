@@ -33,19 +33,19 @@ pub fn array_zip<const N: usize>(
         )
 }
 
-pub fn clamp(number: f64, lower: f64, upper: f64) -> f64 {
-    if number < lower {
-        return lower;
-    } else if number > upper {
-        return upper;
-    } else {
-        return number;
-    }
-}
-
 #[cfg(test)]
 mod test {
     use super::*;
+
+    pub fn clamp(number: f64, lower: f64, upper: f64) -> f64 {
+        if number < lower {
+            return lower;
+        } else if number > upper {
+            return upper;
+        } else {
+            return number;
+        }
+    }
 
     #[test]
     fn test_distance() {

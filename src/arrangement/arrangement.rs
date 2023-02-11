@@ -1,8 +1,8 @@
 use super::arrangement_config::ArrangementConfig;
-use super::arrangement_config::ArrangementConfigError;
 use crate::loc::Loc;
 use crate::ntree::DataPoint;
 use crate::ntree::NTree;
+use crate::LightArrangementError;
 
 const NUM_CHILDREN_FOR_DIVISION: usize = 3;
 
@@ -12,12 +12,12 @@ pub struct Arrangement<const N: usize> {
 }
 
 impl<const N: usize> Arrangement<N> {
-    pub fn new(config: &ArrangementConfig<N>) -> Result<Self, ArrangementConfigError> {
+    pub fn new(config: &ArrangementConfig<N>) -> Result<Self, LightArrangementError> {
         let mut ntree: NTree<usize, N> = NTree::new(NUM_CHILDREN_FOR_DIVISION);
         for (loc, index) in config.light_locations.iter() {
             let res = ntree.insert(*index, *loc);
             if res.is_err() {
-                return Err(ArrangementConfigError::new(format!(
+                return Err(LightArrangementError::new(format!(
                     "Tried to insert index {}
     outside of range",
                     *index

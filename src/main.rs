@@ -1,6 +1,5 @@
-// use led_arrangements::LightStrip;
-use led_arrangements::{
-    strip_builder, ArrangementConfig, Color, LightArrangement, LightConfig, Loc, TestStrip,
+use light_arrangements::{
+    ArrangementConfig, Color, LightArrangement, LightStripConfig, Loc, TestStrip,
     TestStripDisplayConfig,
 };
 use std::{f64::consts::PI, time::Duration};
@@ -29,7 +28,7 @@ fn main() {
 
     let display_config = TestStripDisplayConfig::default();
 
-    let strip = strip_builder::test(&arrangement_config, &display_config);
+    let strip = TestStrip::new(&arrangement_config, &display_config);
 
     let mut light_arrangement: LightArrangement<TestStrip, 3> =
         LightArrangement::new(strip, arrangement_config).unwrap();

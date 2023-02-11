@@ -1,7 +1,8 @@
-use core::fmt;
 use csv::StringRecord;
+use std::fs::File;
 use std::string::String;
-use std::{error::Error, fs::File};
+
+use crate::LightArrangementError;
 
 pub struct ArrangementConfig<const N: usize> {
     pub light_locations: Vec<([f64; N], usize)>,
@@ -14,7 +15,7 @@ impl<const N: usize> ArrangementConfig<N> {
     /// 0.5,0.2,0
     /// Example: light index 1 at (0.5, 0.2, 0.1, 0.8) would be
     /// 0.5,0.2,0.1,0.8,1
-    pub fn from_csv(file_path: &String) -> Result<Self, ArrangementConfigError> {
+    pub fn from_csv(file_path: &String) -> Result<Self, LightArrangementError> {
         let file = File::open(file_path);
         let mut light_locations: Vec<([f64; N], usize)> = vec![];
 
@@ -24,32 +25,31 @@ impl<const N: usize> ArrangementConfig<N> {
                 if let Ok(record) = result {
                     light_locations.push(parse_record(&record)?)
                 } else {
-                    return Err(ArrangementConfigError {
-                        reason: "Error reading row in csv".to_string(),
-                    });
+                    return Err(LightArrangementError::new(
+                        "Error reading row in csv".to_string(),
+                    ));
                 }
             }
             return Ok(Self { light_locations });
         } else {
-            return Err(ArrangementConfigError {
-                reason: format!("Unable to open file: {}", file_path),
-            });
+            return Err(LightArrangementError::new(format!(
+                "Unable to open file: {}",
+                file_path
+            )));
         }
     }
 }
 
 fn parse_record<const N: usize>(
     record: &StringRecord,
-) -> Result<([f64; N], usize), ArrangementConfigError> {
+) -> Result<([f64; N], usize), LightArrangementError> {
     if record.len() != N + 1 {
-        return Err(ArrangementConfigError {
-            reason: format!(
-                "Row in csv had wrong number of
+        return Err(LightArrangementError::new(format!(
+            "Row in csv had wrong number of
         elements; {} instead of {}",
-                record.len(),
-                N + 1
-            ),
-        });
+            record.len(),
+            N + 1
+        )));
     }
 
     let mut pos = [0.0; N];
@@ -58,53 +58,33 @@ fn parse_record<const N: usize>(
         if let Ok(val) = record.get(i).unwrap_or("").parse::<f64>() {
             pos[i] = val;
         } else {
-            return Err(ArrangementConfigError {
-                reason: format!("Unable to access and parse field {} of row", i),
-            });
+            return Err(LightArrangementError::new(format!(
+                "Unable to access and parse field {} of row",
+                i
+            )));
         }
     }
 
     if let Ok(index) = record
         .get(N)
-        .ok_or(ArrangementConfigError {
-            reason: format!("Unable to access field {} of row", N),
-        })?
+        .ok_or(LightArrangementError::new(format!(
+            "Unable to access field {} of row",
+            N
+        )))?
         .parse::<usize>()
     {
         return Ok((pos, index));
     } else {
-        return Err(ArrangementConfigError {
-            reason: "Unable to convert final field to index".to_string(),
-        });
-    }
-}
-
-#[derive(Debug)]
-pub struct ArrangementConfigError {
-    reason: String,
-}
-
-impl ArrangementConfigError {
-    pub fn new(reason: String) -> Self {
-        ArrangementConfigError { reason }
-    }
-
-    pub fn reason(&self) -> String {
-        String::from(&self.reason)
-    }
-}
-
-impl Error for ArrangementConfigError {}
-
-impl fmt::Display for ArrangementConfigError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Unable to create ArrangementConfig: {}", self.reason)
+        return Err(LightArrangementError::new(
+            "Unable to convert final field to index".to_string(),
+        ));
     }
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
+    use std::error::Error;
 
     #[test]
     fn parse_csv() -> Result<(), Box<dyn Error>> {

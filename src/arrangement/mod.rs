@@ -5,5 +5,4 @@ mod light_arrangement;
 
 pub use arrangement::Arrangement;
 pub use arrangement_config::ArrangementConfig;
-pub use arrangement_config::ArrangementConfigError;
 pub use light_arrangement::LightArrangement;

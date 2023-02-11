@@ -1,8 +1,8 @@
 /// Using the ws281x lighting library
-use rs_ws281x::{self, ChannelBuilder, Controller, ControllerBuilder, WS2811Error};
+use rs_ws281x::{self, ChannelBuilder, Controller, ControllerBuilder};
 
-use super::{LightConfig, LightStrip};
-use crate::color::Color;
+use super::{LightStrip, LightStripConfig, RealStrip};
+use crate::{color::Color, LightArrangementError};
 
 const CHANNEL: usize = 0;
 
@@ -10,8 +10,8 @@ pub struct Ws281xStrip {
     controller: Controller,
 }
 
-impl Ws281xStrip {
-    pub fn new(config: LightConfig) -> Result<Self, WS2811Error> {
+impl RealStrip for Ws281xStrip {
+    fn new(config: LightStripConfig) -> Result<Self, LightArrangementError> {
         let controller = ControllerBuilder::new()
             .freq(800_000)
             .dma(10)
@@ -23,8 +23,11 @@ impl Ws281xStrip {
                     .strip_type(rs_ws281x::StripType::Ws2811Rgb)
                     .build(),
             )
-            .build()?;
-        return Ok(Ws281xStrip { controller });
+            .build();
+        return match controller {
+            Ok(controller) => Ok(Ws281xStrip { controller }),
+            Err(error) => Err(LightArrangementError::from_error(error)),
+        };
     }
 }
 

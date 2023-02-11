@@ -1,7 +1,7 @@
 use std::cmp::max;
 use std::fmt::Debug;
 
-/// Representing Colors to assign to lights in the LED Strip
+/// Representing Colors to assign to lights in the Light Strip
 
 #[derive(Copy, Clone, PartialEq)]
 pub struct Color {

@@ -1,5 +1,6 @@
+use super::arrangement::Arrangement;
 use super::arrangement_config::ArrangementConfig;
-use super::{arrangement::Arrangement, arrangement_config::ArrangementConfigError};
+use crate::LightArrangementError;
 use crate::{color::Color, light_strip::LightStrip, loc::Loc, math::distance};
 
 /// Uses Arrangement and LightStrip to assign to lights based on lcation in N dimensional space
@@ -12,7 +13,7 @@ impl<T: LightStrip, const N: usize> LightArrangement<T, N> {
     pub fn new(
         light_strip: T,
         arrangement_config: ArrangementConfig<N>,
-    ) -> Result<Self, ArrangementConfigError> {
+    ) -> Result<Self, LightArrangementError> {
         Ok(LightArrangement {
             arrangement: Arrangement::new(&arrangement_config)?,
             light_strip,
@@ -100,7 +101,7 @@ mod test {
 
     use super::*;
 
-    fn make_light_arrangement() -> Result<LightArrangement<TestStrip, 2>, ArrangementConfigError> {
+    fn make_light_arrangement() -> Result<LightArrangement<TestStrip, 2>, LightArrangementError> {
         let arrangement_config = ArrangementConfig {
             light_locations: vec![
                 ([0.2, 0.2], 0),
