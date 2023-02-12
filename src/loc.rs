@@ -1,6 +1,7 @@
 /// Interface for talking about locations in coordinate space
 /// Converts cartesian, polar, and cylindrical into float arrays
 
+#[derive(Debug, Copy, Clone)]
 pub struct Loc<const N: usize> {
     pub coords: [f64; N],
 }
