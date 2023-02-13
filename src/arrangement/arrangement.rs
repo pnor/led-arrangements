@@ -205,16 +205,16 @@ mod test {
             .collect::<Vec<usize>>(),
             vec![]
         );
-        assert_eq!(
-            arr.get_within_bounding_box(
+        let mut res = arr
+            .get_within_bounding_box(
                 &Loc::cartesian([-0.1, -0.1, -0.1]),
-                &Loc::cartesian([1.1, 1.1, 1.1])
+                &Loc::cartesian([1.1, 1.1, 1.1]),
             )
             .iter()
             .map(|pt| pt.data)
-            .collect::<Vec<usize>>(),
-            vec![1, 2, 3, 4, 5, 6]
-        );
+            .collect::<Vec<usize>>();
+        res.sort();
+        assert_eq!(res, vec![1, 2, 3, 4, 5, 6]);
 
         return Ok(());
     }

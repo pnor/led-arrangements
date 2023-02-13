@@ -84,6 +84,14 @@ impl<T: LightStrip, const N: usize> LightArrangement<T, N> {
         }
     }
 
+    pub fn get_by_index(&mut self, index: usize) -> Color {
+        self.light_strip.get(index)
+    }
+
+    pub fn set_by_index(&mut self, index: usize, color: &Color) {
+        self.light_strip.set(index, color);
+    }
+
     pub fn fill(&mut self, color: &Color) {
         self.light_strip.fill(color)
     }
@@ -97,9 +105,19 @@ impl<T: LightStrip, const N: usize> LightArrangement<T, N> {
 mod test {
     use std::error::Error;
 
-    use crate::{math::clamp, Loc, TestStrip, TestStripDisplayConfig};
+    use crate::{Loc, TestStrip, TestStripDisplayConfig};
 
     use super::*;
+
+    fn clamp(number: f64, lower: f64, upper: f64) -> f64 {
+        if number < lower {
+            return lower;
+        } else if number > upper {
+            return upper;
+        } else {
+            return number;
+        }
+    }
 
     fn make_light_arrangement() -> Result<LightArrangement<TestStrip, 2>, LightArrangementError> {
         let arrangement_config = ArrangementConfig {
@@ -384,5 +402,27 @@ mod test {
         );
 
         return Ok(());
+    }
+
+    #[test]
+    fn get_and_set_by_index() -> Result<(), Box<dyn Error>> {
+        let mut light_arrangement = make_light_arrangement()?;
+
+        let color = Color {
+            red: 255,
+            green: 0,
+            blue: 0,
+        };
+
+        light_arrangement.set_by_index(2, &color);
+        assert_eq!(
+            light_arrangement.get_by_index(2),
+            Color {
+                red: 255,
+                green: 0,
+                blue: 0
+            }
+        );
+        Ok(())
     }
 }
