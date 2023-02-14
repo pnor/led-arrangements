@@ -99,6 +99,10 @@ impl<T: LightStrip, const N: usize> LightArrangement<T, N> {
     pub fn show(&mut self) {
         self.light_strip.show()
     }
+
+    pub fn number_lights(&self) -> usize {
+        self.arrangement.number_lights()
+    }
 }
 
 #[cfg(test)]
@@ -423,6 +427,13 @@ mod test {
                 blue: 0
             }
         );
+        Ok(())
+    }
+
+    #[test]
+    fn number_lights() -> Result<(), Box<dyn Error>> {
+        let light_arrangement = make_light_arrangement()?;
+        assert_eq!(light_arrangement.number_lights(), 25);
         Ok(())
     }
 }
