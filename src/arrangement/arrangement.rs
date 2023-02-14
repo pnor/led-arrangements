@@ -9,13 +9,16 @@ const NUM_CHILDREN_FOR_DIVISION: usize = 3;
 /// Manages the mapping from light index to location in N-dimensional space
 pub struct Arrangement<const N: usize> {
     ntree: NTree<usize, N>,
+    number_lights: usize,
 }
 
 impl<const N: usize> Arrangement<N> {
     pub fn new(config: &ArrangementConfig<N>) -> Result<Self, LightArrangementError> {
         let mut ntree: NTree<usize, N> = NTree::new(NUM_CHILDREN_FOR_DIVISION);
+        let mut number_lights = 0;
         for (loc, index) in config.light_locations.iter() {
             let res = ntree.insert(*index, *loc);
+            number_lights += 1;
             if res.is_err() {
                 return Err(LightArrangementError::new(format!(
                     "Tried to insert index {}
@@ -24,7 +27,10 @@ impl<const N: usize> Arrangement<N> {
                 )));
             }
         }
-        return Ok(Arrangement { ntree });
+        return Ok(Arrangement {
+            ntree,
+            number_lights,
+        });
     }
 
     pub fn get_closest(
@@ -55,6 +61,10 @@ impl<const N: usize> Arrangement<N> {
     ) -> Vec<&DataPoint<usize, N>> {
         self.ntree
             .find_in_box(&lower_corner.coords, &upper_corner.coords)
+    }
+
+    pub fn number_lights(&self) -> usize {
+        self.number_lights
     }
 }
 
@@ -216,6 +226,21 @@ mod test {
         res.sort();
         assert_eq!(res, vec![1, 2, 3, 4, 5, 6]);
 
+        return Ok(());
+    }
+
+    #[test]
+    fn number_lights() -> Result<(), Box<dyn Error>> {
+        let arr = Arrangement::new(&ArrangementConfig {
+            light_locations: vec![
+                ([0.1, 0.1, 0.1], 1),
+                ([0.9, 0.9, 0.9], 2),
+                ([0.5, 0.5, 0.5], 3),
+                ([0.1, 0.9, 0.1], 4),
+                ([0.1, 0.1, 0.9], 5),
+            ],
+        })?;
+        assert_eq!(arr.number_lights(), 5);
         return Ok(());
     }
 }
