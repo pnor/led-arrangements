@@ -23,8 +23,8 @@ pub trait RealStrip {
 }
 
 pub struct LightStripConfig {
-    number_lights: i32,
-    io_pin: i32,
+    pub number_lights: i32,
+    pub io_pin: i32,
 }
 
 impl LightStripConfig {
