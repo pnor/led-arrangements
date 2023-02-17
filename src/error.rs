@@ -1,5 +1,6 @@
 use std::{error::Error, fmt};
 
+#[cfg(feature = "ws281x")]
 use rs_ws281x::WS2811Error;
 
 #[derive(Debug)]
@@ -12,6 +13,7 @@ impl LightArrangementError {
         LightArrangementError { reason }
     }
 
+    #[cfg(feature = "ws281x")]
     pub fn from_error(err: WS2811Error) -> Self {
         LightArrangementError {
             reason: err.to_string(),

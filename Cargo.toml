@@ -6,10 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rs_ws281x = "0.4.4"
+rs_ws281x = { version = "0.4.4", optional = true }
 kiss3d = { version = "0.35.0", optional = true }
 tpntree = "0.5.2"
 csv = "1.1.6"
 
 [features]
 visualizer = ["dep:kiss3d"]
+rs_ws281x = ["dep:rs_ws281x"]

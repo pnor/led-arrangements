@@ -1,4 +1,6 @@
 /// Using the ws281x lighting library
+
+#[cfg(feature = "ws281x")]
 use rs_ws281x::{self, ChannelBuilder, Controller, ControllerBuilder};
 
 use super::{LightStrip, LightStripConfig, RealStrip};
@@ -7,10 +9,12 @@ use crate::{color::Color, LightArrangementError};
 const CHANNEL: usize = 0;
 
 pub struct Ws281xStrip {
+    #[cfg(feature = "ws281x")]
     controller: Controller,
 }
 
 impl RealStrip for Ws281xStrip {
+    #[cfg(feature = "ws281x")]
     fn new(config: LightStripConfig) -> Result<Self, LightArrangementError> {
         let controller = ControllerBuilder::new()
             .freq(800_000)
@@ -29,8 +33,14 @@ impl RealStrip for Ws281xStrip {
             Err(error) => Err(LightArrangementError::from_error(error)),
         };
     }
+
+    #[cfg(not(feature = "ws281x"))]
+    fn new(config: LightStripConfig) -> Result<Self, LightArrangementError> {
+        Ok(Ws281xStrip {})
+    }
 }
 
+#[cfg(feature = "ws281x")]
 impl LightStrip for Ws281xStrip {
     fn get(&self, index: usize) -> Color {
         let raw = self.controller.leds(CHANNEL)[index];
@@ -60,4 +70,21 @@ impl LightStrip for Ws281xStrip {
                 raw[3] = 0;
             });
     }
+}
+
+#[cfg(not(feature = "ws281x"))]
+impl LightStrip for Ws281xStrip {
+    fn get(&self, index: usize) -> Color {
+        return Color {
+            red: 0,
+            green: 0,
+            blue: 0,
+        };
+    }
+
+    fn set(&mut self, index: usize, color: &Color) {}
+
+    fn show(&mut self) {}
+
+    fn fill(&mut self, color: &Color) {}
 }
