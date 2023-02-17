@@ -13,4 +13,4 @@ csv = "1.1.6"
 
 [features]
 visualizer = ["dep:kiss3d"]
-rs_ws281x = ["dep:rs_ws281x"]
+ws281x = ["dep:rs_ws281x"]
