@@ -73,6 +73,6 @@ fn main() {
 
         prog = (prog + 0.03) % 1.0;
 
-        // std::thread::sleep(Duration::from_millis(25));
+        std::thread::sleep(Duration::from_millis(25));
     }
 }
