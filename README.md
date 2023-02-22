@@ -10,3 +10,7 @@ Try out the live demo by cloning the repository and running:
 ```sh
 cargo run --features visualizer
 ```
+
+## Python Bindings
+Check out the python binding here:
+https://github.com/pnor/light-arrangements-python
