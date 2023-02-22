@@ -6,6 +6,7 @@ use crate::LightArrangementError;
 
 pub struct ArrangementConfig<const N: usize> {
     pub light_locations: Vec<([f64; N], usize)>,
+    pub number_children_for_division: usize,
 }
 
 impl<const N: usize> ArrangementConfig<N> {
@@ -15,7 +16,10 @@ impl<const N: usize> ArrangementConfig<N> {
     /// 0.5,0.2,0
     /// Example: light index 1 at (0.5, 0.2, 0.1, 0.8) would be
     /// 0.5,0.2,0.1,0.8,1
-    pub fn from_csv(file_path: &String) -> Result<Self, LightArrangementError> {
+    pub fn from_csv(
+        file_path: &String,
+        number_children_for_division: usize,
+    ) -> Result<Self, LightArrangementError> {
         let file = File::open(file_path);
         let mut light_locations: Vec<([f64; N], usize)> = vec![];
 
@@ -30,7 +34,10 @@ impl<const N: usize> ArrangementConfig<N> {
                     ));
                 }
             }
-            return Ok(Self { light_locations });
+            return Ok(Self {
+                light_locations,
+                number_children_for_division,
+            });
         } else {
             return Err(LightArrangementError::new(format!(
                 "Unable to open file: {}",
@@ -88,7 +95,7 @@ mod test {
 
     #[test]
     fn parse_csv() -> Result<(), Box<dyn Error>> {
-        let arr = ArrangementConfig::<2>::from_csv(&"./test_files/test.csv".to_string())?;
+        let arr = ArrangementConfig::<2>::from_csv(&"./test_files/test.csv".to_string(), 1)?;
         let mut loc = arr.light_locations;
         loc.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
 

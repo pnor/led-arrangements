@@ -24,6 +24,7 @@ fn get_light_locs() -> Vec<([f64; 3], usize)> {
 fn main() {
     let arrangement_config = ArrangementConfig {
         light_locations: get_light_locs(),
+        number_children_for_division: 200,
     };
 
     let display_config = TestStripDisplayConfig::default();
@@ -52,7 +53,17 @@ fn main() {
     };
 
     let mut prog = 0.0;
+    let mut count = 0;
     loop {
+        if {
+            let tmp = count;
+            count += 1;
+            tmp
+        } > 10000
+        {
+            break;
+        }
+
         light_arrangement.fill(&Color {
             red: 0,
             green: 0,

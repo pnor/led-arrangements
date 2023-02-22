@@ -4,8 +4,6 @@ use crate::ntree::DataPoint;
 use crate::ntree::NTree;
 use crate::LightArrangementError;
 
-const NUM_CHILDREN_FOR_DIVISION: usize = 3;
-
 /// Manages the mapping from light index to location in N-dimensional space
 pub struct Arrangement<const N: usize> {
     ntree: NTree<usize, N>,
@@ -14,7 +12,7 @@ pub struct Arrangement<const N: usize> {
 
 impl<const N: usize> Arrangement<N> {
     pub fn new(config: &ArrangementConfig<N>) -> Result<Self, LightArrangementError> {
-        let mut ntree: NTree<usize, N> = NTree::new(NUM_CHILDREN_FOR_DIVISION);
+        let mut ntree: NTree<usize, N> = NTree::new(config.number_children_for_division);
         let mut number_lights = 0;
         for (loc, index) in config.light_locations.iter() {
             let res = ntree.insert(*index, *loc);
@@ -85,6 +83,7 @@ mod test {
                 ([0.1, 0.9, 0.1], 4),
                 ([0.1, 0.1, 0.9], 5),
             ],
+            number_children_for_division: 1,
         })
         .unwrap();
         assert_eq!(
@@ -133,6 +132,7 @@ mod test {
                 ([0.1, 0.1, 0.9], 5),
                 ([0.4, 0.4, 0.4], 6),
             ],
+            number_children_for_division: 1,
         })?;
         let mut v = arr
             .get_within_radius(&Loc::cartesian([0.2, 0.2, 0.2]), 0.2)
@@ -184,6 +184,8 @@ mod test {
                 ([0.1, 0.1, 0.9], 5),
                 ([0.4, 0.4, 0.4], 6),
             ],
+
+            number_children_for_division: 1,
         })?;
         assert_eq!(
             arr.get_within_bounding_box(
@@ -239,6 +241,7 @@ mod test {
                 ([0.1, 0.9, 0.1], 4),
                 ([0.1, 0.1, 0.9], 5),
             ],
+            number_children_for_division: 1,
         })?;
         assert_eq!(arr.number_lights(), 5);
         return Ok(());

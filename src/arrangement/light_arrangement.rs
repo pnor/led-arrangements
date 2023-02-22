@@ -152,6 +152,7 @@ mod test {
                 ([0.8, 1.0], 23),
                 ([1.0, 1.0], 24),
             ],
+            number_children_for_division: 2,
         };
 
         let light_strip = TestStrip::new(&arrangement_config, &TestStripDisplayConfig::default());
