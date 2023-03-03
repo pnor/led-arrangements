@@ -11,11 +11,13 @@ pub struct Color {
 }
 
 impl Color {
+    #[inline]
     pub fn rgb(red: u8, green: u8, blue: u8) -> Self {
         Color { red, green, blue }
     }
 
     /// Dim this color so its brightness is `amount` percentage of what it was
+    #[inline]
     pub fn dim(&mut self, amount: f64) {
         self.red = ((self.red as f64) * amount) as u8;
         self.green = ((self.green as f64) * amount) as u8;
@@ -23,6 +25,7 @@ impl Color {
     }
 
     /// Returns this color's components as a (r, g, b) tuple with values from 0..1
+    #[inline]
     pub fn float_components(&self) -> (f32, f32, f32) {
         let r = self.red as f32 / 255.0;
         let g = self.green as f32 / 255.0;
@@ -31,6 +34,7 @@ impl Color {
     }
 
     /// Merges this color with `other`
+    #[inline]
     pub fn merge(&mut self, other: Color) {
         self.red = max(self.red, other.red);
         self.green = max(self.green, other.green);

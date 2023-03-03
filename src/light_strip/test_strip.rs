@@ -63,11 +63,13 @@ impl TestStrip {
 }
 
 impl LightStrip for TestStrip {
+    #[inline]
     fn get(&self, index: usize) -> Color {
         let (r, g, b) = &self.lights[index];
         return Color::rgb(*r, *g, *b);
     }
 
+    #[inline]
     fn set(&mut self, index: usize, color: &Color) {
         self.lights[index] = (color.red, color.green, color.blue);
         #[cfg(feature = "visualizer")]

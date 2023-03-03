@@ -42,6 +42,7 @@ impl RealStrip for Ws281xStrip {
 
 #[cfg(feature = "ws281x")]
 impl LightStrip for Ws281xStrip {
+    #[inline]
     fn get(&self, index: usize) -> Color {
         let raw = self.controller.leds(CHANNEL)[index];
         return Color {
@@ -51,14 +52,17 @@ impl LightStrip for Ws281xStrip {
         };
     }
 
+    #[inline]
     fn set(&mut self, index: usize, color: &Color) {
         self.controller.leds_mut(CHANNEL)[index] = [color.red, color.green, color.blue, 0];
     }
 
+    #[inline]
     fn show(&mut self) {
         let _ = self.controller.render();
     }
 
+    #[inline]
     fn fill(&mut self, color: &Color) {
         self.controller
             .leds_mut(CHANNEL)
