@@ -20,7 +20,7 @@ impl<T: LightStrip, const N: usize> LightArrangement<T, N> {
         })
     }
 
-    pub fn get_closest(&self, loc: &Loc<N>, max_search_distance: f64) -> Option<Color> {
+    pub fn get_closest(&mut self, loc: &Loc<N>, max_search_distance: f64) -> Option<Color> {
         let datapoint = self.arrangement.get_closest(loc, max_search_distance);
         if let Some(datapoint) = datapoint {
             return Some(self.light_strip.get(datapoint.data));

@@ -3,8 +3,10 @@ extern crate tpntree;
 mod intersection;
 mod spatial_data_tree;
 
+use caches::{Cache, WTinyLFUCache};
 use intersection::box_intersection;
 
+use num::Float;
 use tpntree::{tpntree::SpatialTree, TpnTreeError};
 
 use crate::math::{array_map, array_zip, distance};
@@ -16,17 +18,27 @@ use self::{
 
 pub use spatial_data_tree::DataPoint;
 
-pub struct NTree<T, const N: usize> {
+pub struct NTree<T: Copy, const N: usize> {
     root: SpatialDataTree<T, N>,
     number_children_to_divide: usize,
+    find_in_box_cache: WTinyLFUCache<[(u64, i16, i8, u64, i16, i8); N], Vec<DataPoint<T, N>>>,
 }
 
-impl<T, const N: usize> NTree<T, N> {
+impl<T: Copy, const N: usize> NTree<T, N> {
     /// Creates an `NTree` spanning 0..1 in all dimensions
     pub fn new(number_children_to_divide: usize) -> Self {
+        // TODO window should be like 1-5% of entire, protect and probation half, sample is total
+        let cache_size: usize = 1000;
+        let window = ((cache_size as f32) * 0.01) as usize;
+        let protect = ((cache_size as f32) * 0.49) as usize;
+        let probation = ((cache_size as f32) * 0.50) as usize;
+        assert_eq!(window + protect + probation, cache_size);
+        let cache = WTinyLFUCache::with_sizes(window, protect, probation, cache_size).unwrap();
+
         NTree {
             root: SpatialTree::new([0.5; N], [0.5; N], 0),
             number_children_to_divide,
+            find_in_box_cache: cache,
         }
     }
 
@@ -40,10 +52,10 @@ impl<T, const N: usize> NTree<T, N> {
 
     /// Returns the datapoint closest to `point` that is <= `max_distance` away from `point`
     pub fn find_closest(
-        &self,
+        &mut self,
         point: &[f64; N],
         max_distance: f64,
-    ) -> Result<Option<&DataPoint<T, N>>, TpnTreeError> {
+    ) -> Result<Option<DataPoint<T, N>>, TpnTreeError> {
         if !spans(&self.root, point) {
             return Err(TpnTreeError::DoesNotSpan);
         }
@@ -66,29 +78,50 @@ impl<T, const N: usize> NTree<T, N> {
     }
 
     /// Returns all datapoints within the box region described by the corner points `corner1` and `corner2`.
-    pub fn find_in_box(&self, corner1: &[f64; N], corner2: &[f64; N]) -> Vec<&DataPoint<T, N>> {
+    pub fn find_in_box(&mut self, corner1: &[f64; N], corner2: &[f64; N]) -> Vec<DataPoint<T, N>> {
+        // TODO might have to do copies of the points,
+        // since can;t return references to something lasting as long as this obj without borrowing
+        // self for the lifetime of the obj
+        // unless we remove "find in box" outside fo the lifetime of self? make a way to run this
+        // func without borrowing the entirety of self
+        // - like only mutably borrow cache and borrow self read only
+        // Try the cache
+        let cache_entry: [(u64, i16, i8, u64, i16, i8); N] = corner1
+            .iter()
+            .zip(corner2.iter())
+            .map(&|(c1, c2): (&f64, &f64)| {
+                let (mantissa1, exp1, sign1) = Float::integer_decode(*c1);
+                let (mantissa2, exp2, sign2) = Float::integer_decode(*c2);
+                return (mantissa1, exp1, sign1, mantissa2, exp2, sign2);
+            })
+            .collect::<Vec<(u64, i16, i8, u64, i16, i8)>>()
+            .try_into()
+            .unwrap();
+        if let Some(result) = self.find_in_box_cache.get(&cache_entry) {
+            return result.to_vec();
+        }
+
+        // Compute regularly
         let mut datapoints = vec![];
         for tree in trees_in_box(&self.root, corner1, corner2) {
             if let Some(tree_data) = tree.data() {
                 for child in tree_data {
                     if point_intersection(&child.point, &corner1, &corner2) {
-                        datapoints.push(child);
+                        datapoints.push(child.clone());
                     }
                 }
             }
         }
+
+        self.find_in_box_cache.put(cache_entry, datapoints.clone());
+
         return datapoints;
     }
 
-    pub fn find_in_radius(&self, point: &[f64; N], radius: f64) -> Vec<&DataPoint<T, N>> {
+    pub fn find_in_radius(&mut self, point: &[f64; N], radius: f64) -> Vec<DataPoint<T, N>> {
         let corner1 = array_map(&point, &|x| x - radius);
         let corner2 = array_map(&point, &|x| x + radius);
         let points = self.find_in_box(&corner1, &corner2);
-
-        if points.len() >= 1 {
-            let p = points[0];
-            assert!(p.point[0] > -999.0);
-        }
 
         return points
             .into_iter()
@@ -99,7 +132,7 @@ impl<T, const N: usize> NTree<T, N> {
 
 /// Returns all child TpnTrees whose span intersects the box region described by the corner points
 /// `corner1` and `corner2`
-fn trees_in_box<'a, T, const N: usize>(
+fn trees_in_box<'a, T: Copy, const N: usize>(
     root: &'a SpatialDataTree<T, N>,
     corner1: &[f64; N],
     corner2: &[f64; N],

@@ -32,10 +32,10 @@ impl<const N: usize> Arrangement<N> {
     }
 
     pub fn get_closest(
-        &self,
+        &mut self,
         loc: &Loc<N>,
         max_search_distance: f64,
-    ) -> Option<&DataPoint<usize, N>> {
+    ) -> Option<DataPoint<usize, N>> {
         let res = self.ntree.find_closest(&loc.coords, max_search_distance);
         if let Ok(opt_datapoint) = res {
             return opt_datapoint;
@@ -45,18 +45,18 @@ impl<const N: usize> Arrangement<N> {
     }
 
     pub fn get_within_radius(
-        &self,
+        &mut self,
         loc: &Loc<N>,
         max_search_distance: f64,
-    ) -> Vec<&DataPoint<usize, N>> {
+    ) -> Vec<DataPoint<usize, N>> {
         self.ntree.find_in_radius(&loc.coords, max_search_distance)
     }
 
     pub fn get_within_bounding_box(
-        &self,
+        &mut self,
         lower_corner: &Loc<N>,
         upper_corner: &Loc<N>,
-    ) -> Vec<&DataPoint<usize, N>> {
+    ) -> Vec<DataPoint<usize, N>> {
         self.ntree
             .find_in_box(&lower_corner.coords, &upper_corner.coords)
     }

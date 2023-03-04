@@ -10,6 +10,8 @@ rs_ws281x = { version = "0.4.4", optional = true }
 kiss3d = { version = "0.35.0", optional = true }
 tpntree = "0.5.2"
 csv = "1.1.6"
+caches = "0.2.3"
+num = "0.4.0"
 
 [features]
 visualizer = ["dep:kiss3d"]

@@ -6,12 +6,13 @@ use tpntree::{tpntree::TpnTree, TpnTreeError};
 
 pub type SpatialDataTree<T, const N: usize> = TpnTree<Vec<DataPoint<T, N>>, N>;
 
-pub struct DataPoint<T, const N: usize> {
+#[derive(Copy, Clone)]
+pub struct DataPoint<T: Copy, const N: usize> {
     pub point: [f64; N],
     pub data: T,
 }
 
-pub fn spans<T, const N: usize>(tree: &SpatialDataTree<T, N>, point: &[f64; N]) -> bool {
+pub fn spans<T: Copy, const N: usize>(tree: &SpatialDataTree<T, N>, point: &[f64; N]) -> bool {
     tree.coordinates()
         .iter()
         .enumerate()
@@ -21,7 +22,7 @@ pub fn spans<T, const N: usize>(tree: &SpatialDataTree<T, N>, point: &[f64; N]) 
         })
 }
 
-pub fn insert_by_coordinates<T, const N: usize>(
+pub fn insert_by_coordinates<T: Copy, const N: usize>(
     tree: &mut SpatialDataTree<T, N>,
     datapoint: DataPoint<T, N>,
     division_condition: &dyn Fn(&SpatialDataTree<T, N>) -> bool,
@@ -53,7 +54,7 @@ pub fn insert_by_coordinates<T, const N: usize>(
     }
 }
 
-fn insert_into_children<T, const N: usize>(
+fn insert_into_children<T: Copy, const N: usize>(
     tree: &mut SpatialDataTree<T, N>,
     datapoint: DataPoint<T, N>,
     division_condition: &dyn Fn(&SpatialDataTree<T, N>) -> bool,
