@@ -1,3 +1,4 @@
+#[inline]
 pub fn distance<const N: usize>(p1: &[f64; N], p2: &[f64; N]) -> f64 {
     let mut sum: f64 = 0.0;
     for i in 0..N {
@@ -6,6 +7,7 @@ pub fn distance<const N: usize>(p1: &[f64; N], p2: &[f64; N]) -> f64 {
     return sum.sqrt();
 }
 
+#[inline]
 pub fn array_map<const N: usize>(arr: &[f64; N], func: &dyn Fn(&f64) -> f64) -> [f64; N] {
     arr.iter()
         .map(func)
@@ -17,6 +19,7 @@ pub fn array_map<const N: usize>(arr: &[f64; N], func: &dyn Fn(&f64) -> f64) -> 
         )
 }
 
+#[inline]
 pub fn array_zip<const N: usize>(
     arr1: &[f64; N],
     arr2: &[f64; N],
