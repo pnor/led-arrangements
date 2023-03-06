@@ -14,6 +14,7 @@ pub use arrangement::LightArrangement;
 pub use color::Color;
 pub use error::LightArrangementError;
 pub use light_strip::{
-    LightStrip, LightStripConfig, RealStrip, TestStrip, TestStripDisplayConfig, Ws281xStrip,
+    ColorOrder, LightStrip, LightStripConfig, RealStrip, TestStrip, TestStripDisplayConfig,
+    Ws281xStrip,
 };
 pub use loc::Loc;
