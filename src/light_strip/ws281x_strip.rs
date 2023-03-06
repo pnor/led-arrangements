@@ -25,7 +25,7 @@ impl RealStrip for Ws281xStrip {
                     .pin(config.io_pin)
                     .count(config.number_lights)
                     .strip_type(rs_ws281x::StripType::Ws2811Bgr)
-                    .brightness(220)
+                    .brightness(160)
                     .build(),
             )
             .build();
