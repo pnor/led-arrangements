@@ -25,13 +25,41 @@ pub trait RealStrip {
 pub struct LightStripConfig {
     pub number_lights: i32,
     pub io_pin: i32,
+    pub brightness: u8,
+    pub order: ColorOrder,
+    pub frequency: u32,
 }
 
 impl LightStripConfig {
-    pub fn new(number_lights: i32, io_pin: i32) -> Self {
+    /// Creates the config for a light strip
+    /// `number_lights`: number of lights on the strip
+    /// `io_pin`: GPIO pin on the rasberry pi used to control the lights
+    /// `brightness`: 0..255 brightness value to set lights
+    /// `order`: Color order of the strip
+    /// `frequency`: Frequency of the signal to the LEDs, usually 800K
+    pub fn new(
+        number_lights: i32,
+        io_pin: i32,
+        brightness: u8,
+        order: ColorOrder,
+        frequency: u32,
+    ) -> Self {
         LightStripConfig {
             number_lights,
             io_pin,
+            brightness,
+            order,
+            frequency,
         }
     }
+}
+
+/// Color order of the light strip
+pub enum ColorOrder {
+    Rgb,
+    Rbg,
+    Grb,
+    Gbr,
+    Brg,
+    Bgr,
 }

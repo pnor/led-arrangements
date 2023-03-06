@@ -16,16 +16,25 @@ pub struct Ws281xStrip {
 impl RealStrip for Ws281xStrip {
     #[cfg(feature = "ws281x")]
     fn new(config: LightStripConfig) -> Result<Self, LightArrangementError> {
+        let strip_type = match config.order {
+            super::ColorOrder::Rgb => rs_ws281x::StripType::Ws2811Rgb,
+            super::ColorOrder::Rbg => rs_ws281x::StripType::Ws2811Rbg,
+            super::ColorOrder::Grb => rs_ws281x::StripType::Ws2811Grb,
+            super::ColorOrder::Gbr => rs_ws281x::StripType::Ws2811Gbr,
+            super::ColorOrder::Brg => rs_ws281x::StripType::Ws2811Brg,
+            super::ColorOrder::Bgr => rs_ws281x::StripType::Ws2811Bgr,
+        };
+
         let controller = ControllerBuilder::new()
-            .freq(800_000)
+            .freq(config.frequency)
             .dma(10)
             .channel(
                 CHANNEL,
                 ChannelBuilder::new()
                     .pin(config.io_pin)
                     .count(config.number_lights)
-                    .strip_type(rs_ws281x::StripType::Ws2811Bgr)
-                    .brightness(160)
+                    .strip_type(strip_type)
+                    .brightness(config.brightness)
                     .build(),
             )
             .build();
