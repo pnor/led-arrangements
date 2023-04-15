@@ -44,12 +44,14 @@ impl TestStrip {
             objects[i].prepend_to_local_translation(&Translation3::new(pt[0], pt[1], pt[2]));
         }
 
-        return Self {
+        let mut strip = Self {
             lights,
             window,
             objects,
             camera,
         };
+        strip.fill(&Color::rgb(0, 0, 0));
+        return strip;
     }
 
     #[cfg(not(feature = "visualizer"))]
